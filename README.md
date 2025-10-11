@@ -8,6 +8,7 @@ An AI-powered agent that analyzes job postings against resumes to assess suitabi
 - **Multiple Input Formats**: Supports job descriptions from URLs or files, resumes in text, Markdown, or Word formats
 - **AI-Powered**: Uses Claude or Ollama for intelligent analysis
 - **Comprehensive Output**: Generates resume improvements, cover letters, interview questions, and action plans
+- **Resume Caching**: Automatically caches parsed resume content for faster subsequent analyses
 - **Beautiful CLI**: Rich console output with progress indicators and formatted results
 
 ## Installation
@@ -73,6 +74,8 @@ python main.py --job job.txt --resume resume.docx --format json
 - `--output, -o`: Output file path (optional). Saves JSON to file while also displaying console output
 - `--format, -f`: Output format for console display (text/json, default: text)
 - `--verbose, -v`: Enable verbose output
+- `--clear-cache`: Clear resume cache and exit
+- `--cache-stats`: Show cache statistics and exit
 
 ## Supported Formats
 
@@ -113,6 +116,15 @@ python main.py --job job_description.txt --resume resume.md --output analysis_re
 ### Use specific LLM provider
 ```bash
 python main.py --job job.txt --resume resume.docx --provider ollama
+```
+
+### Cache management
+```bash
+# Show cache statistics
+python main.py --cache-stats
+
+# Clear resume cache
+python main.py --clear-cache
 ```
 
 ## Requirements

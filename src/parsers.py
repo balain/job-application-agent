@@ -11,6 +11,8 @@ from bs4 import BeautifulSoup
 from docx import Document
 from rich.console import Console
 
+from .cache import resume_cache
+
 console = Console()
 
 
@@ -131,7 +133,7 @@ class ResumeParser:
     @staticmethod
     def parse(file_path: str) -> str:
         """
-        Parse resume from file.
+        Parse resume from file with caching support.
         
         Args:
             file_path: Path to resume file
@@ -142,6 +144,12 @@ class ResumeParser:
         Raises:
             ValueError: If file cannot be parsed
         """
+        # Check cache first
+        cached_content = resume_cache.get_resume(file_path)
+        if cached_content:
+            return cached_content
+        
+        # Parse file if not cached
         path = Path(file_path)
         
         if not path.exists():
@@ -150,12 +158,17 @@ class ResumeParser:
         suffix = path.suffix.lower()
         
         if suffix == '.docx':
-            return ResumeParser._parse_docx(file_path)
+            content = ResumeParser._parse_docx(file_path)
         elif suffix in ['.txt', '.md', '.markdown']:
-            return ResumeParser._parse_text(file_path)
+            content = ResumeParser._parse_text(file_path)
         else:
             # Try to parse as text file
-            return ResumeParser._parse_text(file_path)
+            content = ResumeParser._parse_text(file_path)
+        
+        # Cache the parsed content
+        resume_cache.set_resume(file_path, content)
+        
+        return content
     
     @staticmethod
     def _parse_docx(file_path: str) -> str:

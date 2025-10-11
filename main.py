@@ -12,6 +12,7 @@ from src.parsers import validate_inputs
 from src.llm_provider import create_llm_provider
 from src.analyzer import JobApplicationAnalyzer
 from src.output import OutputFormatter
+from src.cache import resume_cache
 
 console = Console()
 
@@ -65,9 +66,35 @@ Examples:
         help="Enable verbose output"
     )
     
+    parser.add_argument(
+        "--clear-cache",
+        action="store_true",
+        help="Clear resume cache and exit"
+    )
+    
+    parser.add_argument(
+        "--cache-stats",
+        action="store_true",
+        help="Show cache statistics and exit"
+    )
+    
     args = parser.parse_args()
     
     try:
+        # Handle cache management commands
+        if args.clear_cache:
+            resume_cache.clear_cache()
+            console.print("[green]Cache cleared successfully[/green]")
+            sys.exit(0)
+        
+        if args.cache_stats:
+            stats = resume_cache.get_cache_stats()
+            console.print("\n[bold blue]Cache Statistics[/bold blue]")
+            console.print(f"Total entries: {stats['total_entries']}")
+            console.print(f"Resume entries: {stats['resume_entries']}")
+            console.print(f"Cache file size: {stats['cache_file_size']} bytes")
+            sys.exit(0)
+        
         # Display header
         console.print(Panel.fit(
             "[bold blue]Job Application Agent[/bold blue]\n"

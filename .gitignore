@@ -22,3 +22,6 @@ wheels/
 .DS_Store
 Thumbs.db
 temp-plan
+
+# Cache directory
+.cache/
