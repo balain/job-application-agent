@@ -55,10 +55,13 @@ python main.py --job "https://example.com/job-posting" --resume resume.docx
 # Specify LLM provider
 python main.py --job job.txt --resume resume.md --provider claude
 
-# Save results to file
+# Save results to JSON file (displays console output AND saves JSON)
 python main.py --job job.txt --resume resume.docx --output results.json
 
-# JSON output format
+# Plain text output (default)
+python main.py --job job.txt --resume resume.docx
+
+# JSON console output
 python main.py --job job.txt --resume resume.docx --format json
 ```
 
@@ -67,8 +70,8 @@ python main.py --job job.txt --resume resume.docx --format json
 - `--job, -j`: Job description file path or URL (required)
 - `--resume, -r`: Resume file path (required)
 - `--provider, -p`: LLM provider (claude/ollama, auto-detect if not specified)
-- `--output, -o`: Output file path (optional)
-- `--format, -f`: Output format (console/json, default: console)
+- `--output, -o`: Output file path (optional). Saves JSON to file while also displaying console output
+- `--format, -f`: Output format for console display (text/json, default: text)
 - `--verbose, -v`: Enable verbose output
 
 ## Supported Formats
@@ -101,8 +104,9 @@ The agent provides:
 python main.py --job "https://company.com/careers/software-engineer" --resume my_resume.docx
 ```
 
-### Save results to file
+### Save results to file (dual output)
 ```bash
+# Displays rich console output AND saves JSON to file
 python main.py --job job_description.txt --resume resume.md --output analysis_results.json
 ```
 

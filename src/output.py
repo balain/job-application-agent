@@ -21,41 +21,49 @@ class OutputFormatter:
     def __init__(self, verbose: bool = False):
         self.verbose = verbose
     
-    def display_results(self, results: Dict[str, Any], output_format: str = "console") -> None:
+    def display_results(self, results: Dict[str, Any], output_format: str = "text") -> None:
         """
         Display analysis results in the specified format.
         
         Args:
             results: Analysis results dictionary
-            output_format: Output format ('console' or 'json')
+            output_format: Output format ('text' or 'json')
         """
         if output_format == "json":
             self._display_json(results)
         else:
-            self._display_console(results)
+            self._display_text(results)
     
-    def _display_console(self, results: Dict[str, Any]) -> None:
-        """Display results in rich console format."""
+    def _display_text(self, results: Dict[str, Any]) -> None:
+        """Display results in plain text format."""
         assessment = results['assessment']
         materials = results.get('materials')
         should_proceed = results['should_proceed']
         
         # Header
-        console.print("\n" + "="*80)
-        console.print("[bold blue]JOB APPLICATION ANALYSIS RESULTS[/bold blue]")
-        console.print("="*80)
+        print("\n" + "="*80)
+        print("JOB APPLICATION ANALYSIS RESULTS")
+        print("="*80)
         
         # Assessment Summary
-        self._display_assessment_summary(assessment, should_proceed)
+        self._display_assessment_summary_text(assessment, should_proceed)
         
         # Detailed Assessment
-        self._display_detailed_assessment(assessment)
+        self._display_detailed_assessment_text(assessment)
         
         # Application Materials (if available)
         if materials:
-            self._display_application_materials(materials)
+            self._display_application_materials_text(materials)
         else:
-            console.print("\n[red]No additional materials generated - application not recommended[/red]")
+            print("\nNo additional materials generated - application not recommended")
+    
+    def _display_assessment_summary_text(self, assessment: AssessmentResult, should_proceed: bool) -> None:
+        """Display assessment summary in plain text."""
+        print("\nASSESSMENT SUMMARY")
+        print("-" * 50)
+        print(f"Suitability Rating: {assessment.rating}/10")
+        print(f"Recommendation: {assessment.recommendation}")
+        print(f"Confidence Level: {assessment.confidence}")
     
     def _display_assessment_summary(self, assessment: AssessmentResult, should_proceed: bool) -> None:
         """Display assessment summary."""
@@ -77,6 +85,26 @@ class OutputFormatter:
         table.add_row("Confidence Level", assessment.confidence)
         
         console.print(table)
+    
+    def _display_detailed_assessment_text(self, assessment: AssessmentResult) -> None:
+        """Display detailed assessment breakdown in plain text."""
+        print("\nDETAILED ASSESSMENT")
+        print("=" * 50)
+        
+        # Strengths
+        print("\nSTRENGTHS:")
+        print("-" * 20)
+        print(assessment.strengths)
+        
+        # Gaps
+        print("\nAREAS FOR IMPROVEMENT:")
+        print("-" * 30)
+        print(assessment.gaps)
+        
+        # Missing Requirements
+        print("\nMISSING REQUIREMENTS:")
+        print("-" * 25)
+        print(assessment.missing_requirements)
     
     def _display_detailed_assessment(self, assessment: AssessmentResult) -> None:
         """Display detailed assessment breakdown."""
@@ -105,6 +133,40 @@ class OutputFormatter:
             border_style="red"
         )
         console.print(missing_panel)
+    
+    def _display_application_materials_text(self, materials: ApplicationMaterials) -> None:
+        """Display generated application materials in plain text."""
+        print("\nAPPLICATION MATERIALS")
+        print("=" * 50)
+        
+        # Resume Improvements
+        print("\nRESUME IMPROVEMENT SUGGESTIONS:")
+        print("-" * 35)
+        print(materials.resume_improvements)
+        
+        # Cover Letter
+        print("\nCOVER LETTER:")
+        print("-" * 15)
+        print(materials.cover_letter)
+        
+        # Interview Questions
+        print("\nQUESTIONS TO ASK THE HIRING MANAGER:")
+        print("-" * 40)
+        print(materials.questions_for_employer)
+        
+        print("\nANTICIPATED INTERVIEW QUESTIONS:")
+        print("-" * 35)
+        print(materials.anticipated_questions)
+        
+        # Suggested Answers
+        print("\nSUGGESTED INTERVIEW ANSWERS:")
+        print("-" * 32)
+        print(materials.suggested_answers)
+        
+        # Next Steps
+        print("\nNEXT STEPS ACTION PLAN:")
+        print("-" * 25)
+        print(materials.next_steps)
     
     def _display_application_materials(self, materials: ApplicationMaterials) -> None:
         """Display generated application materials."""
@@ -187,10 +249,9 @@ class OutputFormatter:
         """
         output_path = Path(output_file)
         
-        if output_path.suffix.lower() == '.json':
-            self._save_json(results, output_file)
-        else:
-            self._save_text(results, output_file)
+        # Always save as JSON for structured data, regardless of file extension
+        # This ensures consistent, parseable output for programmatic use
+        self._save_json(results, output_file)
     
     def _save_json(self, results: Dict[str, Any], output_file: str) -> None:
         """Save results as JSON file."""

@@ -49,14 +49,14 @@ Examples:
     
     parser.add_argument(
         "--output", "-o",
-        help="Output file path (optional)"
+        help="Output file path (optional). If specified, saves JSON to file while also displaying console output"
     )
     
     parser.add_argument(
         "--format", "-f",
-        choices=["console", "json"],
-        default="console",
-        help="Output format (default: console)"
+        choices=["text", "json"],
+        default="text",
+        help="Output format for console display (default: text). JSON file output is always in JSON format"
     )
     
     parser.add_argument(
@@ -102,9 +102,10 @@ Examples:
         formatter = OutputFormatter(verbose=args.verbose)
         formatter.display_results(results, args.format)
         
-        # Save results if requested
+        # Save results if requested (always saves as JSON when output file specified)
         if args.output:
             formatter.save_results(results, args.output)
+            console.print(f"[green]✓ Results also saved to: {args.output}[/green]")
         
         # Exit with appropriate code
         if results['should_proceed']:
