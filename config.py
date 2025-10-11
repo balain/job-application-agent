@@ -12,11 +12,14 @@ class Config:
     
     # API Keys
     ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY")
-    OLLAMA_BASE_URL = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
+    OLLAMA_BASE_URL = os.getenv("OLLAMA_BASE_URL", "http://127.0.0.1:11434")
     
     # Default LLM settings
-    DEFAULT_CLAUDE_MODEL = "claude-sonnet-4-5-20250929" # "claude-3-5-sonnet-20241022"
-    DEFAULT_OLLAMA_MODEL = "llama3.1:8b"
+    # DEFAULT_CLAUDE_MODEL = "claude-sonnet-4-5-20250929" # 
+    DEFAULT_CLAUDE_MODEL = "claude-3-5-sonnet-20241022"
+    # DEFAULT_OLLAMA_MODEL = "llama3.1:70b"
+    # DEFAULT_OLLAMA_MODEL = "llama3.3:latest"
+    DEFAULT_OLLAMA_MODEL = "granite4:small-h"
     
     # Output settings
     DEFAULT_OUTPUT_FORMAT = "console"  # console, json

@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "job-application-agent": {
+      "command": "python",
+      "args": ["main.py", "--mcp-server"],
+      "env": {
+        "ANTHROPIC_API_KEY": "${ANTHROPIC_API_KEY}",
+        "OLLAMA_BASE_URL": "${OLLAMA_BASE_URL}"
+      }
+    }
+  }
+}

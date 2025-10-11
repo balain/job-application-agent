@@ -12,6 +12,9 @@ wheels/
 # Environment variables
 .env
 
+# Data files - inputs and outputs
+data/
+
 # IDE files
 .vscode/
 .idea/

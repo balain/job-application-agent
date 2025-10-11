@@ -78,6 +78,12 @@ Examples:
         help="Show cache statistics and exit"
     )
     
+    parser.add_argument(
+        "--mcp-server",
+        action="store_true",
+        help="Run as MCP server for AI assistant integration"
+    )
+    
     args = parser.parse_args()
     
     try:
@@ -93,6 +99,13 @@ Examples:
             console.print(f"Total entries: {stats['total_entries']}")
             console.print(f"Resume entries: {stats['resume_entries']}")
             console.print(f"Cache file size: {stats['cache_file_size']} bytes")
+            sys.exit(0)
+        
+        if args.mcp_server:
+            console.print("[blue]Starting MCP server...[/blue]")
+            import asyncio
+            from src.mcp_server import main as mcp_main
+            asyncio.run(mcp_main())
             sys.exit(0)
         
         # Display header

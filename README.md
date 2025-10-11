@@ -9,6 +9,7 @@ An AI-powered agent that analyzes job postings against resumes to assess suitabi
 - **AI-Powered**: Uses Claude or Ollama for intelligent analysis
 - **Comprehensive Output**: Generates resume improvements, cover letters, interview questions, and action plans
 - **Resume Caching**: Automatically caches parsed resume content for faster subsequent analyses
+- **MCP Server**: Can run as Model Context Protocol server for AI assistant integration
 - **Beautiful CLI**: Rich console output with progress indicators and formatted results
 
 ## Installation
@@ -76,6 +77,7 @@ python main.py --job job.txt --resume resume.docx --format json
 - `--verbose, -v`: Enable verbose output
 - `--clear-cache`: Clear resume cache and exit
 - `--cache-stats`: Show cache statistics and exit
+- `--mcp-server`: Run as MCP server for AI assistant integration
 
 ## Supported Formats
 
@@ -126,6 +128,53 @@ python main.py --cache-stats
 # Clear resume cache
 python main.py --clear-cache
 ```
+
+### MCP Server Mode
+```bash
+# Run as MCP server for AI assistant integration
+python main.py --mcp-server
+```
+
+## MCP Server Integration
+
+The job application agent can run as an MCP (Model Context Protocol) server, allowing it to be used as a tool within AI assistants like Claude Desktop.
+
+### Setup for Claude Desktop
+
+1. **Install the agent** (if not already done):
+```bash
+pip install -e .
+```
+
+2. **Configure Claude Desktop** by adding to your MCP settings:
+```json
+{
+  "mcpServers": {
+    "job-application-agent": {
+      "command": "python",
+      "args": ["/path/to/job-application-agent/main.py", "--mcp-server"],
+      "env": {
+        "ANTHROPIC_API_KEY": "your_api_key_here"
+      }
+    }
+  }
+}
+```
+
+3. **Available MCP Tools**:
+   - `analyze_job_application`: Complete job application analysis
+   - `get_resume_improvements`: Resume improvement suggestions
+   - `generate_cover_letter`: Tailored cover letter generation
+   - `prepare_interview_questions`: Interview preparation
+   - `get_next_steps`: Action plan for job application
+
+### Usage in AI Assistants
+
+Once configured, you can use natural language commands like:
+- "Analyze this job posting against my resume"
+- "Generate a cover letter for this position"
+- "What improvements should I make to my resume for this job?"
+- "Prepare me for the interview for this role"
 
 ## Requirements
 
