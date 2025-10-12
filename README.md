@@ -17,7 +17,7 @@ An AI-powered agent that analyzes job postings against resumes to assess suitabi
 
 1. Clone the repository:
 ```bash
-git clone <repository-url>
+git clone https://github.com/balain/job-application-agent.git
 cd job-application-agent
 ```
 
