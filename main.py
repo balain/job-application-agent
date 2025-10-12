@@ -25,22 +25,24 @@ def main():
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
+  # CLI mode
   python main.py --job "https://example.com/job" --resume resume.docx
   python main.py --job job.txt --resume resume.md --provider claude
   python main.py --job job.txt --resume resume.docx --output results.json
+  
+  # MCP server mode
+  python main.py --mcp-server
         """
     )
     
     parser.add_argument(
         "--job", "-j",
-        required=True,
-        help="Job description file path or URL"
+        help="Job description file path or URL (not required for MCP server mode)"
     )
     
     parser.add_argument(
         "--resume", "-r",
-        required=True,
-        help="Resume file path"
+        help="Resume file path (not required for MCP server mode)"
     )
     
     parser.add_argument(
@@ -108,6 +110,12 @@ Examples:
             from src.fallback_mcp_server import main as mcp_main
             mcp_main()
             sys.exit(0)
+        
+        # Validate that job and resume are provided for CLI mode
+        if not args.job or not args.resume:
+            console.print("[red]Error: --job and --resume are required for CLI mode[/red]")
+            console.print("Use --mcp-server to run in MCP server mode")
+            sys.exit(1)
         
         # Display header
         console.print(Panel.fit(

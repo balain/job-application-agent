@@ -42,13 +42,13 @@ def create_fallback_mcp_server():
                         "tools": [
                             {
                                 "name": "analyze_job_application",
-                                "description": "Analyze a job application by comparing job description with resume content",
+                                "description": "Analyze a job application by comparing job description with resume content. The MCP client should provide the job description and resume content directly.",
                                 "inputSchema": {
                                     "type": "object",
                                     "properties": {
                                         "job_description": {
                                             "type": "string",
-                                            "description": "The job description text or URL"
+                                            "description": "The job description text (not URL - provide the actual content)"
                                         },
                                         "resume_content": {
                                             "type": "string", 
@@ -70,16 +70,32 @@ def create_fallback_mcp_server():
                 
                 if tool_name == "analyze_job_application":
                     # Import here to avoid circular imports
-                    from .parsers import JobDescriptionParser
                     from .llm_provider import create_llm_provider
                     from .analyzer import JobApplicationAnalyzer
                     
                     job_description = arguments.get("job_description", "")
                     resume_content = arguments.get("resume_content", "")
                     
-                    # Parse job description if it's a URL
-                    if job_description.startswith(("http://", "https://")):
-                        job_description = JobDescriptionParser.parse(job_description)
+                    # Validate inputs
+                    if not job_description.strip():
+                        return {
+                            "jsonrpc": "2.0",
+                            "id": request.get("id"),
+                            "error": {
+                                "code": -32602,
+                                "message": "job_description is required and cannot be empty"
+                            }
+                        }
+                    
+                    if not resume_content.strip():
+                        return {
+                            "jsonrpc": "2.0",
+                            "id": request.get("id"),
+                            "error": {
+                                "code": -32602,
+                                "message": "resume_content is required and cannot be empty"
+                            }
+                        }
                     
                     # Initialize analyzer
                     llm_provider = create_llm_provider()
