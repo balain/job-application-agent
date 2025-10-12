@@ -52,16 +52,16 @@ class JobApplicationAnalyzer:
         Returns:
             Dictionary containing all analysis results
         """
-        console.print("[bold blue]Starting job application analysis...[/bold blue]")
+        console.print("[bold blue]Starting job application analysis...[/bold blue]", file=sys.stderr)
         
         # Step 1: Initial assessment
-        console.print("[yellow]Step 1: Assessing job suitability...[/yellow]")
+        console.print("[yellow]Step 1: Assessing job suitability...[/yellow]", file=sys.stderr)
         assessment = self._perform_initial_assessment(job_description, resume)
         
         # Step 2: Generate additional materials if recommended
         materials = None
         if self._should_proceed_with_application(assessment):
-            console.print("[yellow]Step 2: Generating application materials...[/yellow]")
+            console.print("[yellow]Step 2: Generating application materials...[/yellow]", file=sys.stderr)
             materials = self._generate_application_materials(
                 job_description, resume, assessment.raw_response
             )
@@ -80,7 +80,7 @@ class JobApplicationAnalyzer:
             response = self.llm_provider.generate_response(prompt)
             return self._parse_assessment_response(response)
         except Exception as e:
-            console.print(f"[red]Error in assessment: {e}[/red]")
+            console.print(f"[red]Error in assessment: {e}[/red]", file=sys.stderr)
             raise
     
     def _parse_assessment_response(self, response: str) -> AssessmentResult:
@@ -131,17 +131,17 @@ class JobApplicationAnalyzer:
         materials = {}
         
         # Generate resume improvements
-        console.print("  - Generating resume improvements...")
+        console.print("  - Generating resume improvements...", file=sys.stderr)
         resume_prompt = PromptTemplates.get_resume_improvement_prompt(job_description, resume, assessment)
         materials['resume_improvements'] = self.llm_provider.generate_response(resume_prompt)
         
         # Generate cover letter
-        console.print("  - Generating cover letter...")
+        console.print("  - Generating cover letter...", file=sys.stderr)
         cover_letter_prompt = PromptTemplates.get_cover_letter_prompt(job_description, resume, assessment)
         materials['cover_letter'] = self.llm_provider.generate_response(cover_letter_prompt)
         
         # Generate interview questions
-        console.print("  - Preparing interview questions...")
+        console.print("  - Preparing interview questions...", file=sys.stderr)
         questions_prompt = PromptTemplates.get_interview_questions_prompt(job_description, resume, assessment)
         questions_response = self.llm_provider.generate_response(questions_prompt)
         
@@ -150,7 +150,7 @@ class JobApplicationAnalyzer:
         materials.update(questions_data)
         
         # Generate next steps
-        console.print("  - Creating action plan...")
+        console.print("  - Creating action plan...", file=sys.stderr)
         next_steps_prompt = PromptTemplates.get_next_steps_prompt(job_description, resume, assessment)
         materials['next_steps'] = self.llm_provider.generate_response(next_steps_prompt)
         

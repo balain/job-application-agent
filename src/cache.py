@@ -34,7 +34,7 @@ class ResumeCache:
                 with open(self.cache_file, 'r', encoding='utf-8') as f:
                     return json.load(f)
             except (json.JSONDecodeError, IOError):
-                console.print("[yellow]Warning: Cache file corrupted, starting fresh[/yellow]")
+                console.print("[yellow]Warning: Cache file corrupted, starting fresh[/yellow]", file=sys.stderr)
         return {}
     
     def _save_cache(self):
@@ -43,7 +43,7 @@ class ResumeCache:
             with open(self.cache_file, 'w', encoding='utf-8') as f:
                 json.dump(self.cache_data, f, indent=2, ensure_ascii=False)
         except IOError as e:
-            console.print(f"[yellow]Warning: Could not save cache: {e}[/yellow]")
+            console.print(f"[yellow]Warning: Could not save cache: {e}[/yellow]", file=sys.stderr)
     
     def _get_file_hash(self, file_path: str) -> str:
         """Generate hash for file content and modification time."""
@@ -79,7 +79,7 @@ class ResumeCache:
             
             # Check if cache is still valid (file hasn't changed)
             if cached_entry.get('file_hash') == file_hash:
-                console.print(f"[blue]Using cached resume content[/blue]")
+                console.print(f"[blue]Using cached resume content[/blue]", file=sys.stderr)
                 return cached_entry.get('content')
             else:
                 # File has changed, remove old cache entry
@@ -110,14 +110,14 @@ class ResumeCache:
         }
         
         self._save_cache()
-        console.print(f"[green]Cached resume content[/green]")
+        console.print(f"[green]Cached resume content[/green]", file=sys.stderr)
     
     def clear_cache(self) -> None:
         """Clear all cached data."""
         self.cache_data = {}
         if self.cache_file.exists():
             self.cache_file.unlink()
-        console.print("[blue]Cache cleared[/blue]")
+        console.print("[blue]Cache cleared[/blue]", file=sys.stderr)
     
     def get_cache_stats(self) -> dict:
         """Get cache statistics."""
@@ -157,7 +157,7 @@ class ResumeCache:
         
         if removed_count > 0:
             self._save_cache()
-            console.print(f"[blue]Cleaned up {removed_count} old cache entries[/blue]")
+            console.print(f"[blue]Cleaned up {removed_count} old cache entries[/blue]", file=sys.stderr)
         
         return removed_count
 

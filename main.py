@@ -14,7 +14,8 @@ from src.analyzer import JobApplicationAnalyzer
 from src.output import OutputFormatter
 from src.cache import resume_cache
 
-console = Console()
+# console = Console()
+console = Console(file=sys.stderr)
 
 
 def main():

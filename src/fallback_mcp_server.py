@@ -11,7 +11,30 @@ def create_fallback_mcp_server():
     def handle_request(request: Dict[str, Any]) -> Dict[str, Any]:
         """Handle MCP requests."""
         try:
-            if request.get("method") == "tools/list":
+            method = request.get("method")
+            
+            # Handle initialize method (required for MCP handshake)
+            if method == "initialize":
+                return {
+                    "jsonrpc": "2.0",
+                    "id": request.get("id"),
+                    "result": {
+                        "protocolVersion": "2025-06-18",
+                        "capabilities": {
+                            "tools": {}
+                        },
+                        "serverInfo": {
+                            "name": "job-application-agent",
+                            "version": "1.0.0"
+                        }
+                    }
+                }
+            
+            # Handle initialized notification (no response needed)
+            elif method == "notifications/initialized":
+                return None  # Notifications don't need responses
+            
+            elif method == "tools/list":
                 return {
                     "jsonrpc": "2.0",
                     "id": request.get("id"),
@@ -39,7 +62,8 @@ def create_fallback_mcp_server():
                     }
                 }
             
-            elif request.get("method") == "tools/call":
+            elif method == "tools/call":
+                # ... your existing tools/call code ...
                 params = request.get("params", {})
                 tool_name = params.get("name")
                 arguments = params.get("arguments", {})
@@ -141,8 +165,11 @@ def create_fallback_mcp_server():
                 try:
                     request = json.loads(line.strip())
                     response = handle_request(request)
-                    print(json.dumps(response))
-                    sys.stdout.flush()
+
+                    if response is not None:
+                        print(json.dumps(response))
+                        sys.stdout.flush()
+
                 except json.JSONDecodeError:
                     continue
                 except Exception as e:
