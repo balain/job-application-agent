@@ -7,17 +7,23 @@ import time
 from pathlib import Path
 from typing import Optional, Any
 
+from platformdirs import user_cache_dir
 from rich.console import Console
 
 console = Console()
 
 
 class ResumeCache:
-    """Simple file-based cache for resume content."""
+    """Simple file-based cache for resume content using platformdirs."""
     
-    def __init__(self, cache_dir: str = ".cache"):
-        self.cache_dir = Path(cache_dir)
-        self.cache_dir.mkdir(exist_ok=True)
+    def __init__(self, cache_dir: Optional[str] = None):
+        if cache_dir is None:
+            # Use platformdirs to get system-appropriate cache directory
+            self.cache_dir = Path(user_cache_dir("job-application-agent", "job-application-agent"))
+        else:
+            self.cache_dir = Path(cache_dir)
+        
+        self.cache_dir.mkdir(parents=True, exist_ok=True)
         self.cache_file = self.cache_dir / "resume_cache.json"
         self.cache_data = self._load_cache()
     
@@ -121,7 +127,8 @@ class ResumeCache:
         return {
             'total_entries': total_entries,
             'resume_entries': resume_entries,
-            'cache_file_size': self.cache_file.stat().st_size if self.cache_file.exists() else 0
+            'cache_file_size': self.cache_file.stat().st_size if self.cache_file.exists() else 0,
+            'cache_directory': str(self.cache_dir.absolute())
         }
     
     def cleanup_old_entries(self, max_age_days: int = 30) -> int:

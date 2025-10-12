@@ -2,19 +2,19 @@
 
 import asyncio
 import json
+import sys
 from typing import Any, Dict, List, Optional
 
-from mcp.server import Server
-from mcp.server.models import InitializationOptions
-from mcp.server.stdio import stdio_server
-from mcp.types import (
-    CallToolRequest,
-    ListToolsRequest,
-    Tool,
-    TextContent,
-    ImageContent,
-    EmbeddedResource,
-)
+try:
+    from mcp.server import Server
+    from mcp.server.models import InitializationOptions
+    from mcp.server.stdio import stdio_server
+    from mcp.types import Tool, TextContent
+    MCP_AVAILABLE = True
+except ImportError:
+    MCP_AVAILABLE = False
+    print("MCP library not available. Please install with: pip install mcp", file=sys.stderr)
+    sys.exit(1)
 
 from .parsers import JobDescriptionParser, ResumeParser
 from .llm_provider import create_llm_provider
@@ -174,8 +174,9 @@ class JobApplicationMCPServer:
         
         await self._ensure_llm_provider(provider)
         
-        # Perform analysis
-        results = self.analyzer.analyze_application(job_description, resume_content)
+        # Perform analysis (run in thread pool to avoid blocking)
+        loop = asyncio.get_event_loop()
+        results = await loop.run_in_executor(None, self.analyzer.analyze_application, job_description, resume_content)
         
         # Format results as text
         output = []
@@ -211,8 +212,9 @@ class JobApplicationMCPServer:
         
         await self._ensure_llm_provider()
         
-        # Get initial assessment
-        results = self.analyzer.analyze_application(job_description, resume_content)
+        # Get initial assessment (run in thread pool)
+        loop = asyncio.get_event_loop()
+        results = await loop.run_in_executor(None, self.analyzer.analyze_application, job_description, resume_content)
         
         if results.get('materials'):
             return [TextContent(type="text", text=results['materials'].resume_improvements)]
@@ -229,8 +231,9 @@ class JobApplicationMCPServer:
         
         await self._ensure_llm_provider()
         
-        # Get initial assessment
-        results = self.analyzer.analyze_application(job_description, resume_content)
+        # Get initial assessment (run in thread pool)
+        loop = asyncio.get_event_loop()
+        results = await loop.run_in_executor(None, self.analyzer.analyze_application, job_description, resume_content)
         
         if results.get('materials'):
             return [TextContent(type="text", text=results['materials'].cover_letter)]
@@ -247,8 +250,9 @@ class JobApplicationMCPServer:
         
         await self._ensure_llm_provider()
         
-        # Get initial assessment
-        results = self.analyzer.analyze_application(job_description, resume_content)
+        # Get initial assessment (run in thread pool)
+        loop = asyncio.get_event_loop()
+        results = await loop.run_in_executor(None, self.analyzer.analyze_application, job_description, resume_content)
         
         if results.get('materials'):
             materials = results['materials']
@@ -270,8 +274,9 @@ class JobApplicationMCPServer:
         
         await self._ensure_llm_provider()
         
-        # Get initial assessment
-        results = self.analyzer.analyze_application(job_description, resume_content)
+        # Get initial assessment (run in thread pool)
+        loop = asyncio.get_event_loop()
+        results = await loop.run_in_executor(None, self.analyzer.analyze_application, job_description, resume_content)
         
         if results.get('materials'):
             return [TextContent(type="text", text=results['materials'].next_steps)]
@@ -280,19 +285,23 @@ class JobApplicationMCPServer:
     
     async def run(self):
         """Run the MCP server."""
-        async with stdio_server() as (read_stream, write_stream):
-            await self.server.run(
-                read_stream,
-                write_stream,
-                InitializationOptions(
-                    server_name="job-application-agent",
-                    server_version="1.0.0",
-                    capabilities=self.server.get_capabilities(
-                        notification_options=None,
-                        experimental_capabilities=None,
+        try:
+            async with stdio_server() as (read_stream, write_stream):
+                await self.server.run(
+                    read_stream,
+                    write_stream,
+                    InitializationOptions(
+                        server_name="job-application-agent",
+                        server_version="1.0.0",
+                        capabilities=self.server.get_capabilities(
+                            notification_options=None,
+                            experimental_capabilities=None,
+                        ),
                     ),
-                ),
-            )
+                )
+        except Exception as e:
+            print(f"MCP Server Error: {e}", file=sys.stderr)
+            raise
 
 
 async def main():

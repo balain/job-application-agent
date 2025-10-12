@@ -8,8 +8,9 @@ An AI-powered agent that analyzes job postings against resumes to assess suitabi
 - **Multiple Input Formats**: Supports job descriptions from URLs or files, resumes in text, Markdown, or Word formats
 - **AI-Powered**: Uses Claude or Ollama for intelligent analysis
 - **Comprehensive Output**: Generates resume improvements, cover letters, interview questions, and action plans
-- **Resume Caching**: Automatically caches parsed resume content for faster subsequent analyses
+- **Resume Caching**: Automatically caches parsed resume content in system cache directory for faster subsequent analyses
 - **MCP Server**: Can run as Model Context Protocol server for AI assistant integration
+- **Auto Markdown**: Automatically generates Markdown reports when using JSON output
 - **Beautiful CLI**: Rich console output with progress indicators and formatted results
 
 ## Installation
@@ -63,7 +64,7 @@ python main.py --job job.txt --resume resume.docx --output results.json
 # Plain text output (default)
 python main.py --job job.txt --resume resume.docx
 
-# JSON console output
+# JSON console output (automatically creates Markdown report)
 python main.py --job job.txt --resume resume.docx --format json
 ```
 
@@ -122,12 +123,17 @@ python main.py --job job.txt --resume resume.docx --provider ollama
 
 ### Cache management
 ```bash
-# Show cache statistics
+# Show cache statistics (including cache directory location)
 python main.py --cache-stats
 
 # Clear resume cache
 python main.py --clear-cache
 ```
+
+**Cache Location**: The resume cache is stored in your system's default cache directory:
+- **macOS**: `~/Library/Caches/job-application-agent/job-application-agent/`
+- **Linux**: `~/.cache/job-application-agent/job-application-agent/`
+- **Windows**: `%LOCALAPPDATA%\job-application-agent\job-application-agent\`
 
 ### MCP Server Mode
 ```bash
@@ -175,6 +181,29 @@ Once configured, you can use natural language commands like:
 - "Generate a cover letter for this position"
 - "What improvements should I make to my resume for this job?"
 - "Prepare me for the interview for this role"
+
+## Automatic Markdown Generation
+
+When using JSON output format, the agent automatically creates a human-readable Markdown report:
+
+### With File Output
+```bash
+# Creates both results.json AND results.md
+python main.py --job job.txt --resume resume.docx --output results.json
+```
+
+### With JSON Console Output
+```bash
+# Creates job_analysis_YYYYMMDD_HHMMSS.md automatically
+python main.py --job job.txt --resume resume.docx --format json
+```
+
+### Markdown Report Features
+- **Structured sections**: Assessment summary, detailed analysis, application materials
+- **Professional formatting**: Headers, bullet points, and clear organization
+- **Timestamp**: Shows when the analysis was generated
+- **Complete content**: All analysis results in readable format
+- **Easy sharing**: Perfect for emailing or including in applications
 
 ## Requirements
 

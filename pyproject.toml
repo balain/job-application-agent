@@ -12,6 +12,7 @@ dependencies = [
     "rich>=13.7.0",  # Beautiful CLI output
     "python-dotenv>=1.0.0",  # Environment variable management
     "mcp>=1.0.0",  # Model Context Protocol
+    "platformdirs>=4.0.0",  # Cross-platform directory management
 ]
 
 [project.scripts]
