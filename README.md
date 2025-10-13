@@ -1,14 +1,37 @@
 # Job Application Agent
 
-An AI-powered agent that analyzes job postings against resumes to assess suitability and provide comprehensive recommendations for job applications.
+An AI-powered analysis tool that evaluates job postings against resumes to assess suitability and provide comprehensive recommendations for job applications.
 
-## Features
+## ⚠️ Important: This is NOT an automated job application tool
+
+This agent **analyzes and provides recommendations**
+
+**What it does NOT do:**
+- ❌ Automatically apply to jobs
+- ❌ Scrape job listings from websites
+- ❌ Submit applications on your behalf
+- ❌ Fill out job application forms
+
+**What it DOES do:**
+- ✅ Analyzes job fit and provides suitability ratings
+- ✅ Generates tailored application materials
+- ✅ Prepares you for interviews
+- ✅ Helps you decide which jobs to apply for
+
+## How It Works
+
+The Job Application Agent follows a structured workflow to analyze job applications:
+
+![Workflow](app-workflow.png)
+
+
+### Key Features
 
 - **Smart Analysis**: Rates job suitability on a 1-10 scale with detailed breakdown
 - **Multiple Input Formats**: Supports job descriptions from URLs or files, resumes in text, Markdown, or Word formats
 - **AI-Powered**: Uses Claude or Ollama for intelligent analysis
 - **Comprehensive Output**: Generates resume improvements, cover letters, interview questions, and action plans
-- **Resume Caching**: Automatically caches parsed resume content in system cache directory for faster subsequent analyses
+- **Resume Caching**: Automatically caches parsed resume content for faster subsequent analyses
 - **MCP Server**: Can run as Model Context Protocol server for AI assistant integration
 - **Auto Markdown**: Automatically generates Markdown reports when using JSON output
 - **Beautiful CLI**: Rich console output with progress indicators and formatted results
