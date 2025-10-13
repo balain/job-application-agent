@@ -233,7 +233,7 @@ python main.py --job job.txt --resume resume.docx --format json
 ### **Future Development Plan**
 - **[FUTURE.md](FUTURE.md)**: Comprehensive roadmap for enhancing the Job Application Agent
   - **6-phase implementation plan** with detailed technical specifications
-  - **Graph database integration** with ArangoDB for knowledge storage
+  - **Graph database integration** with Neo4j for knowledge storage
   - **Advanced analytics** including application tracking and career insights
   - **Web interface development** for improved user experience
   - **Security enhancements** with data encryption and GDPR compliance
@@ -243,7 +243,7 @@ python main.py --job job.txt --resume resume.docx --format json
 - **[GRAPH_DB_ALTERNATIVES.md](GRAPH_DB_ALTERNATIVES.md)**: Detailed comparison of graph database options
   - **6 major alternatives** analyzed: Neo4j, ArangoDB, Dgraph, JanusGraph, OrientDB, TinkerPop
   - **Feature comparison table** with ratings and capabilities
-  - **Selection criteria** and justification for ArangoDB choice
+  - **Selection criteria** and justification for Neo4j choice
   - **Implementation examples** and code samples for each option
   - **Resource links** for further learning and documentation
 
