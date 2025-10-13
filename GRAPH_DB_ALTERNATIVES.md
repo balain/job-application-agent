@@ -22,7 +22,7 @@ This document provides a comprehensive comparison of graph database alternatives
 
 ## 📊 **Comprehensive Comparison**
 
-### **1. Neo4j** ⭐ **INDUSTRY STANDARD**
+### **1. Neo4j** ⭐ **SELECTED**
 
 #### **Pros**
 - ✅ **Industry leader**: Most popular and mature graph database
@@ -96,7 +96,7 @@ with driver.session() as session:
 
 ---
 
-### **2. ArangoDB** ⭐ **SELECTED**
+### **2. ArangoDB** ⭐ **MULTI-MODEL**
 
 #### **Pros**
 - ✅ **Multi-model**: Graph + Document + Key-Value in one database
@@ -424,7 +424,7 @@ g.addE('applied_to').from_(v1).to(v2).next()
 ## 🚀 **Implementation Roadmap**
 
 ### **Phase 1: Basic Setup (Week 3)**
-- Install ArangoDB using Docker
+- Install Neo4j using Docker
 - Create basic knowledge graph module
 - Implement CRUD operations
 - Test with sample data
@@ -445,11 +445,11 @@ g.addE('applied_to').from_(v1).to(v2).next()
 
 ## 📚 **Additional Resources**
 
-### **ArangoDB Documentation**
-- [Official Documentation](https://www.arangodb.com/docs/)
-- [Python Driver](https://python-arango.readthedocs.io/)
-- [AQL Tutorial](https://www.arangodb.com/docs/stable/aql/)
-- [Docker Setup](https://www.arangodb.com/docs/stable/deployment-docker.html)
+### **Neo4j Documentation**
+- [Official Documentation](https://neo4j.com/docs/)
+- [Python Driver](https://neo4j.com/docs/python-manual/current/)
+- [Cypher Manual](https://neo4j.com/docs/cypher-manual/current/)
+- [Docker Setup](https://neo4j.com/docs/operations-manual/current/docker/)
 
 ### **Alternative Resources**
 - [Dgraph Documentation](https://dgraph.io/docs/)
