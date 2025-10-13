@@ -43,125 +43,181 @@ class DataEncryption:
 ### **2.1 Graph Database Architecture**
 ```python
 # New module: src/knowledge_graph.py
-from arango import ArangoClient
+from neo4j import GraphDatabase
 
-class ArangoKnowledgeGraph:
-    def __init__(self, host='localhost', port=8529, database='job_application_agent'):
-        self.client = ArangoClient(hosts=f'http://{host}:{port}')
-        self.db = self.client.db(database)
-        self._setup_collections()
+class Neo4jKnowledgeGraph:
+    def __init__(self, uri='bolt://localhost:7687', user='neo4j', password='password'):
+        self.driver = GraphDatabase.driver(uri, auth=(user, password))
+        self._setup_constraints()
     
-    def _setup_collections(self):
-        # Create document collections (nodes)
-        collections = [
-            'applications', 'companies', 'jobs', 'skills', 
-            'industries', 'resumes', 'persons'
-        ]
-        for collection in collections:
-            if not self.db.has_collection(collection):
-                self.db.create_collection(collection)
-        
-        # Create edge collections (relationships)
-        edges = [
-            'applied_to', 'at_company', 'requires_skill', 
-            'has_skill', 'similar_to', 'in_industry'
-        ]
-        for edge in edges:
-            if not self.db.has_collection(edge):
-                self.db.create_collection(edge, edge=True)
+    def _setup_constraints(self):
+        """Create unique constraints for nodes"""
+        with self.driver.session() as session:
+            # Create unique constraints
+            constraints = [
+                "CREATE CONSTRAINT person_id IF NOT EXISTS FOR (p:Person) REQUIRE p.id IS UNIQUE",
+                "CREATE CONSTRAINT application_id IF NOT EXISTS FOR (a:Application) REQUIRE a.id IS UNIQUE",
+                "CREATE CONSTRAINT company_id IF NOT EXISTS FOR (c:Company) REQUIRE c.id IS UNIQUE",
+                "CREATE CONSTRAINT job_id IF NOT EXISTS FOR (j:Job) REQUIRE j.id IS UNIQUE",
+                "CREATE CONSTRAINT skill_id IF NOT EXISTS FOR (s:Skill) REQUIRE s.id IS UNIQUE"
+            ]
+            for constraint in constraints:
+                try:
+                    session.run(constraint)
+                except Exception:
+                    pass  # Constraint might already exist
     
     def create_application_node(self, application_data: dict) -> str:
-        # Create application node with properties
-        return self.db.collection('applications').insert(application_data)
+        """Create application node with properties"""
+        with self.driver.session() as session:
+            query = """
+            CREATE (a:Application {
+                id: $id,
+                job_title: $job_title,
+                company: $company,
+                applied_date: $applied_date,
+                status: $status,
+                salary_range: $salary_range,
+                location: $location
+            })
+            RETURN a.id as id
+            """
+            result = session.run(query, **application_data)
+            return result.single()['id']
     
     def create_company_node(self, company_data: dict) -> str:
-        # Create company node with industry, size, culture
-        return self.db.collection('companies').insert(company_data)
+        """Create company node with industry, size, culture"""
+        with self.driver.session() as session:
+            query = """
+            CREATE (c:Company {
+                id: $id,
+                name: $name,
+                industry: $industry,
+                size: $size,
+                location: $location,
+                culture: $culture,
+                website: $website
+            })
+            RETURN c.id as id
+            """
+            result = session.run(query, **company_data)
+            return result.single()['id']
     
     def create_skill_node(self, skill: str, category: str) -> str:
-        # Create skill node with categorization
-        skill_data = {'name': skill, 'category': category, 'importance_level': 1}
-        return self.db.collection('skills').insert(skill_data)
+        """Create skill node with categorization"""
+        with self.driver.session() as session:
+            query = """
+            CREATE (s:Skill {
+                id: $id,
+                name: $name,
+                category: $category,
+                importance_level: $importance_level
+            })
+            RETURN s.id as id
+            """
+            result = session.run(query, {
+                'id': f"skill_{skill.lower().replace(' ', '_')}",
+                'name': skill,
+                'category': category,
+                'importance_level': 1
+            })
+            return result.single()['id']
     
-    def create_relationship(self, from_collection: str, to_collection: str, 
+    def create_relationship(self, from_label: str, to_label: str, 
                           from_id: str, to_id: str, rel_type: str, properties: dict = None):
-        # Create relationships between entities using AQL
-        edge_data = {
-            '_from': f'{from_collection}/{from_id}',
-            '_to': f'{to_collection}/{to_id}',
-            'type': rel_type
-        }
-        if properties:
-            edge_data.update(properties)
-        return self.db.collection(rel_type).insert(edge_data)
+        """Create relationships between entities using Cypher"""
+        with self.driver.session() as session:
+            query = f"""
+            MATCH (from:{from_label} {{id: $from_id}})
+            MATCH (to:{to_label} {{id: $to_id}})
+            CREATE (from)-[r:{rel_type}]->(to)
+            """
+            if properties:
+                query += "SET r += $properties"
+            
+            session.run(query, {
+                'from_id': from_id,
+                'to_id': to_id,
+                'properties': properties or {}
+            })
 ```
 
 ### **2.2 Graph Schema Design**
-```python
-# ArangoDB Collections (Documents = Nodes)
-collections = {
-    'persons': {
-        'id': 'string',
-        'name': 'string', 
-        'email': 'string',
-        'created_at': 'datetime'
-    },
-    'applications': {
-        'id': 'string',
-        'job_title': 'string',
-        'company': 'string', 
-        'applied_date': 'datetime',
-        'status': 'string',  # Applied, Interview, Rejected, etc.
-        'salary_range': 'string',
-        'location': 'string'
-    },
-    'companies': {
-        'id': 'string',
-        'name': 'string',
-        'industry': 'string',
-        'size': 'string',  # Startup, Mid-size, Enterprise
-        'location': 'string',
-        'culture': 'string',
-        'website': 'string'
-    },
-    'jobs': {
-        'id': 'string',
-        'title': 'string',
-        'description': 'string',
-        'requirements': 'array',
-        'seniority': 'string',  # Entry, Mid, Senior, Executive
-        'department': 'string'
-    },
-    'skills': {
-        'id': 'string',
-        'name': 'string',
-        'category': 'string',  # Technical, Soft, Domain-specific
-        'importance_level': 'number'
-    },
-    'industries': {
-        'id': 'string',
-        'name': 'string',
-        'description': 'string',
-        'growth_rate': 'number'
-    },
-    'resumes': {
-        'id': 'string',
-        'version': 'string',
-        'created_at': 'datetime',
-        'file_path': 'string',
-        'hash': 'string'
-    }
-}
+```cypher
+// Neo4j Node Labels and Properties
+// Person nodes
+CREATE (p:Person {
+    id: 'person_1',
+    name: 'John Doe',
+    email: 'john@example.com',
+    created_at: datetime()
+})
 
-# Edge Collections (Relationships)
-edges = {
-    'applied_to': 'Person -> Application',
-    'at_company': 'Application -> Company', 
-    'requires_skill': 'Job -> Skill',
-    'has_skill': 'Person -> Skill',
-    'similar_to': 'Company -> Company / Job -> Job',
-    'in_industry': 'Company -> Industry'
-}
+// Application nodes
+CREATE (a:Application {
+    id: 'app_1',
+    job_title: 'Software Engineer',
+    company: 'Tech Corp',
+    applied_date: date('2024-01-15'),
+    status: 'Applied',
+    salary_range: '$80k-120k',
+    location: 'San Francisco'
+})
+
+// Company nodes
+CREATE (c:Company {
+    id: 'company_1',
+    name: 'Tech Corp',
+    industry: 'Technology',
+    size: 'Mid-size',
+    location: 'San Francisco',
+    culture: 'Innovative',
+    website: 'https://techcorp.com'
+})
+
+// Job nodes
+CREATE (j:Job {
+    id: 'job_1',
+    title: 'Software Engineer',
+    description: 'Full-stack development role...',
+    requirements: ['Python', 'React', 'AWS'],
+    seniority: 'Mid-level',
+    department: 'Engineering'
+})
+
+// Skill nodes
+CREATE (s:Skill {
+    id: 'skill_python',
+    name: 'Python',
+    category: 'Technical',
+    importance_level: 5
+})
+
+// Industry nodes
+CREATE (i:Industry {
+    id: 'industry_tech',
+    name: 'Technology',
+    description: 'Software and technology sector',
+    growth_rate: 0.15
+})
+
+// Resume nodes
+CREATE (r:Resume {
+    id: 'resume_1',
+    version: 'v1.0',
+    created_at: datetime(),
+    file_path: '/path/to/resume.pdf',
+    hash: 'abc123def456'
+})
+
+// Relationship Types
+// (Person)-[:APPLIED_TO]->(Application)
+// (Application)-[:AT_COMPANY]->(Company)
+// (Job)-[:REQUIRES_SKILL]->(Skill)
+// (Person)-[:HAS_SKILL]->(Skill)
+// (Company)-[:SIMILAR_TO]->(Company)
+// (Job)-[:SIMILAR_TO]->(Job)
+// (Company)-[:IN_INDUSTRY]->(Industry)
 ```
 
 ### **2.3 Knowledge Graph Features**
@@ -171,7 +227,7 @@ edges = {
 - **Recommendation Engine**: Suggest similar jobs, companies, skills to develop
 - **Network Analysis**: Analyze job market connections and opportunities
 
-### **2.4 Advanced Graph Queries (AQL)**
+### **2.4 Advanced Graph Queries (Cypher)**
 ```python
 # Find similar companies to ones you've applied to
 def find_similar_companies(self, person_id: str) -> list:
@@ -572,7 +628,7 @@ RETURN similar.name, similar.industry, similar.size
 ```python
 # Additional packages needed
 cryptography>=41.0.0  # Encryption
-python-arango>=7.0.0  # ArangoDB driver
+neo4j>=5.0.0         # Neo4j driver
 sqlalchemy>=2.0.0     # Relational database
 fastapi>=0.100.0      # Web framework
 uvicorn>=0.23.0        # ASGI server
@@ -584,12 +640,12 @@ spacy>=3.6.0          # NLP for entity extraction
 ```
 
 ### **Database Setup**
-- **ArangoDB**: Multi-model database for knowledge store and relationships
+- **Neo4j**: Graph database for knowledge store and relationships
 - **SQLite**: Local development (relational data)
 - **PostgreSQL**: Production deployment (relational data)
 - **Encrypted storage**: All data encrypted at rest
 - **Backup system**: Encrypted backups for both graph and relational data
-- **Graph visualization**: ArangoDB Web Interface for relationship exploration
+- **Graph visualization**: Neo4j Browser for relationship exploration
 
 ### **Security Considerations**
 - **Key management**: Secure key storage
