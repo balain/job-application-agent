@@ -1,5 +1,6 @@
 """LLM provider abstraction and implementations."""
 
+import sys
 import json
 import time
 from abc import ABC, abstractmethod
@@ -11,7 +12,7 @@ from rich.console import Console
 
 from config import Config
 
-console = Console()
+console = Console(file=sys.stderr)
 
 
 class LLMProvider(ABC):
@@ -52,7 +53,7 @@ class ClaudeProvider(LLMProvider):
             raise ValueError("Claude client not initialized")
         
         try:
-            console.print("[blue]Generating response with Claude...[/blue]", file=sys.stderr)
+            console.print("[blue]Generating response with Claude...[/blue]")
             
             response = self.client.messages.create(
                 model=self.model,
@@ -91,7 +92,7 @@ class OllamaProvider(LLMProvider):
     def generate_response(self, prompt: str, **kwargs) -> str:
         """Generate response using Ollama API."""
         try:
-            console.print(f"[blue]Generating response with Ollama ({self.model})...[/blue]", file=sys.stderr)
+            console.print(f"[blue]Generating response with Ollama ({self.model})...[/blue]")
             
             payload = {
                 "model": self.model,

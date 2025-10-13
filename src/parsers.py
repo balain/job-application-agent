@@ -1,6 +1,7 @@
 """Input parsers for job descriptions and resumes."""
 
 import os
+import sys
 import re
 from pathlib import Path
 from typing import Optional, Union
@@ -13,7 +14,7 @@ from rich.console import Console
 
 from .cache import resume_cache
 
-console = Console()
+console = Console(file=sys.stderr)
 
 
 class JobDescriptionParser:
@@ -51,7 +52,7 @@ class JobDescriptionParser:
     def _parse_url(url: str) -> str:
         """Parse job description from URL."""
         try:
-            console.print(f"[blue]Fetching job description from: {url}[/blue]", file=sys.stderr)
+            console.print(f"[blue]Fetching job description from: {url}[/blue]")
             response = requests.get(url, timeout=30)
             response.raise_for_status()
             
@@ -174,7 +175,7 @@ class ResumeParser:
     def _parse_docx(file_path: str) -> str:
         """Parse Word document resume."""
         try:
-            console.print(f"[blue]Parsing Word document: {file_path}[/blue]", file=sys.stderr)
+            console.print(f"[blue]Parsing Word document: {file_path}[/blue]")
             doc = Document(file_path)
             
             # Extract text from all paragraphs
@@ -197,7 +198,7 @@ class ResumeParser:
     def _parse_text(file_path: str) -> str:
         """Parse text-based resume."""
         try:
-            console.print(f"[blue]Parsing text file: {file_path}[/blue]", file=sys.stderr)
+            console.print(f"[blue]Parsing text file: {file_path}[/blue]")
             
             # Try UTF-8 first
             try:
@@ -242,9 +243,9 @@ def validate_inputs(job_source: str, resume_path: str) -> tuple[str, str]:
         job_description = JobDescriptionParser.parse(job_source)
         resume_text = ResumeParser.parse(resume_path)
         
-        console.print("[green]✓ Successfully parsed inputs[/green]", file=sys.stderr)
+        console.print("[green]✓ Successfully parsed inputs[/green]")
         return job_description, resume_text
         
     except Exception as e:
-        console.print(f"[red]✗ Error parsing inputs: {e}[/red]", file=sys.stderr)
+        console.print(f"[red]✗ Error parsing inputs: {e}[/red]")
         raise
