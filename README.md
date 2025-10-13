@@ -228,6 +228,25 @@ python main.py --job job.txt --resume resume.docx --format json
 - **Complete content**: All analysis results in readable format
 - **Easy sharing**: Perfect for emailing or including in applications
 
+## 📋 **Documentation**
+
+### **Future Development Plan**
+- **[FUTURE.md](FUTURE.md)**: Comprehensive roadmap for enhancing the Job Application Agent
+  - **6-phase implementation plan** with detailed technical specifications
+  - **Graph database integration** with ArangoDB for knowledge storage
+  - **Advanced analytics** including application tracking and career insights
+  - **Web interface development** for improved user experience
+  - **Security enhancements** with data encryption and GDPR compliance
+  - **Timeline**: 12-week implementation schedule with clear milestones
+
+### **Graph Database Alternatives**
+- **[GRAPH_DB_ALTERNATIVES.md](GRAPH_DB_ALTERNATIVES.md)**: Detailed comparison of graph database options
+  - **6 major alternatives** analyzed: Neo4j, ArangoDB, Dgraph, JanusGraph, OrientDB, TinkerPop
+  - **Feature comparison table** with ratings and capabilities
+  - **Selection criteria** and justification for ArangoDB choice
+  - **Implementation examples** and code samples for each option
+  - **Resource links** for further learning and documentation
+
 ## Requirements
 
 - Python 3.13+
@@ -235,4 +254,4 @@ python main.py --job job.txt --resume resume.docx --format json
 
 ## License
 
-MIT License
+This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details.
