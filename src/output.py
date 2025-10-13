@@ -1,5 +1,6 @@
 """Output formatting for the job application agent."""
 
+import sys
 import json
 from typing import Dict, Any, Optional
 from pathlib import Path
