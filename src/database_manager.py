@@ -402,7 +402,10 @@ class DatabaseManager:
             # Success rate (offers received + accepted)
             success_count = query.filter(
                 Application.status.in_(
-                    [ApplicationStatus.OFFER_RECEIVED, ApplicationStatus.ACCEPTED]
+                    [
+                        ApplicationStatus.OFFER_RECEIVED,
+                        ApplicationStatus.ACCEPTED,
+                    ]
                 )
             ).count()
 
