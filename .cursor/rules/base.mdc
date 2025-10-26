@@ -219,4 +219,4 @@ except Exception as e:
 - Keep functions focused and under 50 lines when possible
 - Use dependency injection for testability
 - Use `ruff format` and `ruff check` periodically and before every git commit - ensure all issues are removed before checking in code
-- Ensure that all strings listed in ./.ignore-strings are not found (in any capitalization) in any files committed to git; if they are found, warn me before allowing the commit with an explicit message
+- Ensure that all strings listed in ./.ignore-strings are not found (in any capitalization) in any files committed to git; if they are found, warn me before allowing the commit with an explicit message - allow in README.md the GitHub URL: "https://github.com/balain/job-application-agent.git"
