@@ -15,6 +15,13 @@ dependencies = [
     "platformdirs>=4.0.0", # Cross-platform directory management
     "cryptography>=41.0.0", # Encryption
     "yubikey-manager>=5.0.0", # YubiKey support (optional)
+    "pydantic>=2.0.0", # Structured data validation
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-asyncio>=0.21.0",
 ]
 
 [project.scripts]
