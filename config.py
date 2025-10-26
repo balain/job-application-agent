@@ -25,6 +25,18 @@ class Config:
     DEFAULT_OUTPUT_FORMAT = "console"  # console, json
     VERBOSE = os.getenv("VERBOSE", "false").lower() == "true"
     
+    # Encryption and Cache settings
+    CACHE_ENCRYPTION_ENABLED = os.getenv("CACHE_ENCRYPTION_ENABLED", "true").lower() == "true"
+    CACHE_AUTH_METHOD = os.getenv("CACHE_AUTH_METHOD", "password")  # password, keyfile, yubikey
+    CACHE_KEYFILE_PATH = os.getenv("CACHE_KEYFILE_PATH", "")
+    CACHE_EXPIRY_DAYS = int(os.getenv("CACHE_EXPIRY_DAYS", "90"))
+    CACHE_PASSWORD = os.getenv("CACHE_PASSWORD", "")
+    
+    # YubiKey settings (if using hardware key)
+    YUBIKEY_SERIAL = os.getenv("YUBIKEY_SERIAL", "")
+    YUBIKEY_SLOT = int(os.getenv("YUBIKEY_SLOT", "2"))
+    YUBIKEY_PIN = os.getenv("YUBIKEY_PIN", "")
+    
     @classmethod
     def validate(cls) -> bool:
         """Validate that required configuration is present."""

@@ -228,6 +228,72 @@ python main.py --job job.txt --resume resume.docx --format json
 - **Complete content**: All analysis results in readable format
 - **Easy sharing**: Perfect for emailing or including in applications
 
+## 🔒 **Cache Management & Security**
+
+### **Encrypted Caching**
+The application now includes comprehensive data encryption for GDPR compliance:
+
+```bash
+# Clear all cached data (with secure deletion)
+python main.py --clear-cache
+
+# Export cached data to JSON file
+python main.py --export-cache cache_backup.json
+
+# View detailed cache statistics
+python main.py --cache-stats
+```
+
+### **Encryption Options**
+- **Password-based**: Simple password protection (default)
+- **Keyfile**: Use a secure key file for encryption
+- **YubiKey**: Hardware key authentication with PIN (requires `yubikey-manager` package)
+
+### **Automatic Data Expiry**
+- Cache entries automatically expire after 90 days (configurable)
+- Expired entries are cleaned up automatically
+- GDPR-compliant data retention policies
+
+### **Environment Configuration**
+Copy `.env.example` to `.env` and configure:
+
+```bash
+# Enable/disable encryption
+CACHE_ENCRYPTION_ENABLED=true
+
+# Choose authentication method
+CACHE_AUTH_METHOD=password  # or keyfile, yubikey
+
+# Set cache expiry (days)
+CACHE_EXPIRY_DAYS=90
+
+# YubiKey settings (if using hardware key)
+YUBIKEY_SERIAL=12345678
+YUBIKEY_PIN=your_pin
+```
+
+### **Security Features**
+- **AES-256-GCM encryption** for all cached data
+- **Secure file deletion** with multiple overwrite passes
+- **Hardware key support** for enhanced security
+- **Automatic cleanup** of expired data
+- **Export functionality** for data portability
+
+### **YubiKey Hardware Key Support**
+For enhanced security, you can use a YubiKey hardware key:
+
+```bash
+# Install YubiKey support (optional)
+uv add yubikey-manager
+
+# Configure in .env file
+CACHE_AUTH_METHOD=yubikey
+YUBIKEY_SERIAL=your_yubikey_serial
+YUBIKEY_PIN=your_yubikey_pin
+```
+
+**Note**: YubiKey support requires the `yubikey-manager` package and a physical YubiKey device.
+
 ## 📋 **Documentation**
 
 ### **Future Development Plan**
