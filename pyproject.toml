@@ -28,3 +28,9 @@ dev = [
 
 [project.scripts]
 job-agent = "main:main"
+
+[tool.pytest.ini_options]
+filterwarnings = [
+    "ignore::DeprecationWarning:sqlalchemy.*",
+    "ignore::DeprecationWarning:datetime.datetime.utcnow",
+]
