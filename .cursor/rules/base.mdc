@@ -1,0 +1,222 @@
+# Job Application Agent - Cursor Rules
+
+## Project Overview
+This is a Job Application Agent that analyzes job applications using AI (Claude/Ollama) to provide structured assessments, resume optimization, and application tracking. The project uses Python with Pydantic for structured data validation and includes both CLI and web interface capabilities.
+
+## Architecture & Structure
+
+### Core Components
+- `src/models.py` - Pydantic data models for structured output parsing
+- `src/structured_parser.py` - Robust LLM response parsing with JSON/regex fallback
+- `src/analyzer.py` - Core analysis engine and workflow orchestration
+- `src/llm_provider.py` - LLM provider abstraction (Claude, Ollama)
+- `src/cache.py` - File-based caching with encryption
+- `src/encryption.py` - Data encryption utilities
+- `src/output.py` - Rich console output formatting
+- `src/prompts.py` - LLM prompt templates
+
+### Data Models
+All LLM responses are parsed into structured Pydantic models:
+- `JobAssessment` - Core assessment results with rating (1-10), strengths, gaps, recommendation
+- `ResumeImprovements` - Structured improvement suggestions
+- `CoverLetter` - Cover letter components
+- `InterviewQuestions` - Interview Q&A structure
+- `NextSteps` - Action plan structure
+- `AnalysisResult` - Complete analysis container
+
+## Development Guidelines
+
+### Code Style & Standards
+- Use Python 3.13+ with type hints throughout
+- Follow Pydantic v2 syntax (field_validator, ConfigDict, model_dump)
+- Use Rich library for beautiful CLI output with colors and formatting
+- Implement comprehensive error handling with graceful fallbacks
+- Write tests for all new functionality (pytest with 90%+ coverage)
+
+### Structured Output Parsing
+- Always use StructuredParser for LLM response parsing
+- Implement JSON parsing first, with regex fallback as secondary
+- Validate all parsed data using Pydantic models
+- Handle parsing failures gracefully with sensible defaults
+- Log parsing issues for debugging and improvement
+
+### Error Handling
+- Use try/catch blocks around LLM API calls
+- Implement retry logic for transient failures
+- Provide meaningful error messages to users
+- Log errors with appropriate context for debugging
+- Gracefully degrade functionality when services are unavailable
+
+### Testing Strategy
+- Write unit tests for all new functions and classes
+- Test both success and failure scenarios
+- Use pytest fixtures for common test setup
+- Mock external dependencies (LLM providers, file system)
+- Test edge cases and malformed input handling
+
+## Implementation Patterns
+
+### LLM Integration
+```python
+# Always use the LLM provider abstraction
+from src.llm_provider import LLMProviderFactory
+llm_provider = LLMProviderFactory.auto_select_provider()
+
+# Parse responses using StructuredParser
+from src.structured_parser import StructuredParser
+parser = StructuredParser(llm_provider)
+assessment = parser.parse_assessment_response(response)
+```
+
+### Data Model Usage
+```python
+# Use Pydantic models for all structured data
+from src.models import JobAssessment, RecommendationType, ConfidenceLevel
+
+# Validate data on creation
+assessment = JobAssessment(
+    rating=8,
+    strengths="Strong technical background",
+    gaps="Limited management experience",
+    missing_requirements="None",
+    recommendation=RecommendationType.YES,
+    confidence=ConfidenceLevel.HIGH
+)
+```
+
+### Error Handling Pattern
+```python
+try:
+    result = risky_operation()
+    return result
+except SpecificException as e:
+    logger.warning(f"Specific error occurred: {e}")
+    return fallback_value()
+except Exception as e:
+    logger.error(f"Unexpected error: {e}")
+    raise
+```
+
+## File Organization
+
+### New Features
+- Place core logic in `src/` directory
+- Add tests in `tests/` directory with matching structure
+- Update `pyproject.toml` for new dependencies
+- Document new features in relevant plan files in `plans/`
+
+### Configuration
+- Use environment variables for configuration (see `config.py`)
+- Support both development and production settings
+- Validate configuration on startup
+- Provide sensible defaults for optional settings
+
+## Performance Considerations
+
+### Caching
+- Use the existing cache system for expensive operations
+- Cache LLM responses to reduce API calls
+- Implement cache invalidation strategies
+- Consider cache size limits and cleanup
+
+### LLM Usage
+- Minimize API calls through intelligent caching
+- Use appropriate model sizes for different tasks
+- Implement request batching where possible
+- Monitor API usage and costs
+
+## Security & Privacy
+
+### Data Protection
+- Encrypt sensitive data at rest using existing encryption utilities
+- Never log sensitive user data (resumes, personal info)
+- Implement secure file deletion for temporary files
+- Use environment variables for API keys and secrets
+
+### User Data
+- Minimize data collection to what's necessary
+- Implement data retention policies
+- Provide data export and deletion capabilities
+- Follow GDPR/privacy best practices
+
+## Common Tasks
+
+### Adding New Data Models
+1. Define Pydantic model in `src/models.py`
+2. Add parsing methods to `StructuredParser`
+3. Write comprehensive tests
+4. Update prompt templates if needed
+
+### Adding New LLM Providers
+1. Implement `LLMProvider` interface
+2. Add to `LLMProviderFactory`
+3. Test with real API calls
+4. Update configuration options
+
+### Adding New Analysis Features
+1. Extend `JobApplicationAnalyzer` class
+2. Add corresponding data models
+3. Update prompt templates
+4. Add CLI commands in `main.py`
+5. Write integration tests
+
+## Debugging Tips
+
+### Common Issues
+- LLM parsing failures: Check StructuredParser logs and fallback mechanisms
+- API errors: Verify API keys and rate limits
+- Cache issues: Check cache directory permissions and encryption keys
+- Performance: Monitor LLM response times and cache hit rates
+
+### Logging
+- Use appropriate log levels (DEBUG, INFO, WARNING, ERROR)
+- Include relevant context in log messages
+- Log user actions for analytics (without sensitive data)
+- Use structured logging for better parsing
+
+## Future Development
+
+### Planned Features
+- Application tracking database (SQLite)
+- ATS optimization and resume scoring
+- LangChain integration for advanced AI features
+- Web interface with FastAPI and React
+- Real-time collaboration features
+
+### Extensibility
+- Design for plugin architecture
+- Support multiple output formats
+- Enable custom prompt templates
+- Allow third-party integrations
+
+## Dependencies
+
+### Core Dependencies
+- `pydantic>=2.0.0` - Data validation and serialization
+- `anthropic>=0.39.0` - Claude API integration
+- `rich>=13.7.0` - Beautiful CLI output
+- `python-dotenv>=1.0.0` - Environment variable management
+- `cryptography>=41.0.0` - Data encryption
+
+### Development Dependencies
+- `pytest>=7.0.0` - Testing framework
+- `pytest-asyncio>=0.21.0` - Async testing support
+
+## Environment Variables
+- `ANTHROPIC_API_KEY` - Claude API key
+- `OLLAMA_BASE_URL` - Ollama server URL
+- `DEFAULT_CLAUDE_MODEL` - Default Claude model
+- `DEFAULT_OLLAMA_MODEL` - Default Ollama model
+- `CACHE_ENABLED` - Enable/disable caching
+- `ENCRYPTION_ENABLED` - Enable/disable encryption
+
+## Code Quality Standards
+- Maintain 90%+ test coverage
+- Use type hints for all function parameters and returns
+- Follow PEP 8 style guidelines
+- Write docstrings for all public functions and classes
+- Use meaningful variable and function names
+- Keep functions focused and under 50 lines when possible
+- Use dependency injection for testability
+- Use `ruff format` and `ruff check` periodically and before every git commit - ensure all issues are removed before checking in code
+- Ensure that all strings listed in ./.ignore-strings are not found (in any capitalization) in any files committed to git; if they are found, warn me before allowing the commit with an explicit message

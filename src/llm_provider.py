@@ -11,6 +11,7 @@ from anthropic import Anthropic
 from rich.console import Console
 
 from config import Config
+from .error_handler import ErrorHandler, retry_on_failure
 
 console = Console(file=sys.stderr)
 
@@ -35,6 +36,12 @@ class ClaudeProvider(LLMProvider):
     def __init__(self, model: str = None):
         self.model = model or Config.DEFAULT_CLAUDE_MODEL
         self.client = None
+        self.error_handler = ErrorHandler(
+            max_retries=Config.MAX_LLM_RETRIES,
+            retry_delay=Config.LLM_RETRY_DELAY,
+            backoff_factor=Config.LLM_BACKOFF_FACTOR,
+            max_delay=Config.LLM_MAX_DELAY
+        )
         self._initialize_client()
     
     def _initialize_client(self):
@@ -47,10 +54,20 @@ class ClaudeProvider(LLMProvider):
         except Exception as e:
             raise ValueError(f"Failed to initialize Claude client: {e}")
     
+    @retry_on_failure(
+        exceptions=(requests.exceptions.RequestException, Exception),
+        max_retries=Config.MAX_LLM_RETRIES,
+        retry_delay=Config.LLM_RETRY_DELAY
+    )
     def generate_response(self, prompt: str, **kwargs) -> str:
-        """Generate response using Claude API."""
+        """Generate response using Claude API with retry logic."""
         if not self.client:
             raise ValueError("Claude client not initialized")
+        
+        # Validate response structure if enabled
+        if Config.RESPONSE_VALIDATION_ENABLED:
+            if not self.error_handler.validate_response(prompt, "text"):
+                raise ValueError("Invalid prompt structure")
         
         try:
             console.print("[blue]Generating response with Claude...[/blue]")
@@ -62,9 +79,18 @@ class ClaudeProvider(LLMProvider):
                 messages=[{"role": "user", "content": prompt}]
             )
             
-            return response.content[0].text
+            response_text = response.content[0].text
+            
+            # Validate response if enabled
+            if Config.RESPONSE_VALIDATION_ENABLED:
+                if not self.error_handler.validate_response(response_text, "any"):
+                    raise ValueError("Invalid response structure from Claude")
+            
+            return response_text
             
         except Exception as e:
+            error_info = self.error_handler.handle_llm_error(e, "Claude API call")
+            console.print(f"[red]Claude API error: {error_info.user_message}[/red]")
             raise ValueError(f"Claude API error: {e}")
     
     def is_available(self) -> bool:
@@ -78,6 +104,12 @@ class OllamaProvider(LLMProvider):
     def __init__(self, model: str = None, base_url: str = None):
         self.model = model or Config.DEFAULT_OLLAMA_MODEL
         self.base_url = base_url or Config.OLLAMA_BASE_URL
+        self.error_handler = ErrorHandler(
+            max_retries=Config.MAX_LLM_RETRIES,
+            retry_delay=Config.LLM_RETRY_DELAY,
+            backoff_factor=Config.LLM_BACKOFF_FACTOR,
+            max_delay=Config.LLM_MAX_DELAY
+        )
         self._check_availability()
     
     def _check_availability(self):
@@ -89,8 +121,18 @@ class OllamaProvider(LLMProvider):
         except Exception as e:
             raise ValueError(f"Ollama not available: {e}")
     
+    @retry_on_failure(
+        exceptions=(requests.exceptions.RequestException, Exception),
+        max_retries=Config.MAX_LLM_RETRIES,
+        retry_delay=Config.LLM_RETRY_DELAY
+    )
     def generate_response(self, prompt: str, **kwargs) -> str:
-        """Generate response using Ollama API."""
+        """Generate response using Ollama API with retry logic."""
+        # Validate response structure if enabled
+        if Config.RESPONSE_VALIDATION_ENABLED:
+            if not self.error_handler.validate_response(prompt, "text"):
+                raise ValueError("Invalid prompt structure")
+        
         try:
             console.print(f"[blue]Generating response with Ollama ({self.model})...[/blue]")
             
@@ -112,9 +154,18 @@ class OllamaProvider(LLMProvider):
             response.raise_for_status()
             
             result = response.json()
-            return result.get('response', '')
+            response_text = result.get('response', '')
+            
+            # Validate response if enabled
+            if Config.RESPONSE_VALIDATION_ENABLED:
+                if not self.error_handler.validate_response(response_text, "any"):
+                    raise ValueError("Invalid response structure from Ollama")
+            
+            return response_text
             
         except Exception as e:
+            error_info = self.error_handler.handle_llm_error(e, "Ollama API call")
+            console.print(f"[red]Ollama API error: {error_info.user_message}[/red]")
             raise ValueError(f"Ollama API error: {e}")
     
     def is_available(self) -> bool:

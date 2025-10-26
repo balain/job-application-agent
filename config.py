@@ -37,6 +37,18 @@ class Config:
     YUBIKEY_SLOT = int(os.getenv("YUBIKEY_SLOT", "2"))
     YUBIKEY_PIN = os.getenv("YUBIKEY_PIN", "")
     
+    # Error handling and retry settings
+    MAX_LLM_RETRIES = int(os.getenv("MAX_LLM_RETRIES", "3"))
+    LLM_RETRY_DELAY = float(os.getenv("LLM_RETRY_DELAY", "1.0"))
+    LLM_BACKOFF_FACTOR = float(os.getenv("LLM_BACKOFF_FACTOR", "2.0"))
+    LLM_MAX_DELAY = float(os.getenv("LLM_MAX_DELAY", "60.0"))
+    ENABLE_RETRY_LOGIC = os.getenv("ENABLE_RETRY_LOGIC", "true").lower() == "true"
+    
+    # Structured parsing settings
+    STRUCTURED_PARSING_ENABLED = os.getenv("STRUCTURED_PARSING_ENABLED", "true").lower() == "true"
+    FALLBACK_TO_REGEX = os.getenv("FALLBACK_TO_REGEX", "true").lower() == "true"
+    RESPONSE_VALIDATION_ENABLED = os.getenv("RESPONSE_VALIDATION_ENABLED", "true").lower() == "true"
+    
     @classmethod
     def validate(cls) -> bool:
         """Validate that required configuration is present."""

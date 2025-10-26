@@ -272,12 +272,18 @@ class TestErrorInfo:
         error = ErrorInfo(
             error_type="ValidationError",
             error_message="Invalid rating provided",
+            user_message="Please provide a valid rating between 1-10",
+            category="validation",
+            confidence=ConfidenceLevel.HIGH,
             error_context={"rating": 15, "field": "rating"},
             retry_count=2
         )
         
         assert error.error_type == "ValidationError"
         assert error.error_message == "Invalid rating provided"
+        assert error.user_message == "Please provide a valid rating between 1-10"
+        assert error.category == "validation"
+        assert error.confidence == ConfidenceLevel.HIGH
         assert error.error_context["rating"] == 15
         assert error.retry_count == 2
         assert isinstance(error.timestamp, datetime)
@@ -286,9 +292,18 @@ class TestErrorInfo:
         """Test error info with defaults."""
         error = ErrorInfo(
             error_type="APIError",
-            error_message="API request failed"
+            error_message="API request failed",
+            user_message="An API error occurred",
+            category="api",
+            confidence=ConfidenceLevel.MEDIUM
         )
         
+        assert error.error_type == "APIError"
+        assert error.error_message == "API request failed"
+        assert error.user_message == "An API error occurred"
+        assert error.category == "api"
+        assert error.confidence == ConfidenceLevel.MEDIUM
+        assert error.context == ""
         assert error.error_context == {}
         assert error.retry_count == 0
         assert isinstance(error.timestamp, datetime)

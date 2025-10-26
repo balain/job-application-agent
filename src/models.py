@@ -202,6 +202,19 @@ class ErrorInfo(BaseModel):
     error_message: str = Field(
         description="Human-readable error message"
     )
+    user_message: str = Field(
+        description="User-friendly error message"
+    )
+    category: str = Field(
+        description="Error category (rate_limit, timeout, authentication, etc.)"
+    )
+    confidence: ConfidenceLevel = Field(
+        description="Confidence level for error categorization"
+    )
+    context: str = Field(
+        default="",
+        description="Additional context about where the error occurred"
+    )
     error_context: Dict[str, Any] = Field(
         default_factory=dict,
         description="Additional context about the error"
