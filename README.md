@@ -28,6 +28,8 @@ The Job Application Agent follows a structured workflow to analyze job applicati
 ### Key Features
 
 - **Smart Analysis**: Rates job suitability on a 1-10 scale with detailed breakdown
+- **Structured Output Parsing**: Robust JSON-first parsing with regex fallback for reliable data extraction
+- **Error Handling & Retry Logic**: Automatic retry with exponential backoff for LLM API calls
 - **Multiple Input Formats**: Supports job descriptions from URLs or files, resumes in text, Markdown, or Word formats
 - **AI-Powered**: Uses Claude or Ollama for intelligent analysis
 - **Comprehensive Output**: Generates resume improvements, cover letters, interview questions, and action plans
@@ -35,6 +37,49 @@ The Job Application Agent follows a structured workflow to analyze job applicati
 - **MCP Server**: Can run as Model Context Protocol server for AI assistant integration
 - **Auto Markdown**: Automatically generates Markdown reports when using JSON output
 - **Beautiful CLI**: Rich console output with progress indicators and formatted results
+
+## Structured Output Parsing
+
+The Job Application Agent now features a robust structured output parsing system that ensures reliable data extraction from LLM responses:
+
+### JSON-First Approach
+- **Primary Method**: Attempts to parse JSON responses from LLMs
+- **Multiple Formats**: Supports markdown code blocks, generic code blocks, and plain JSON objects
+- **Validation**: Uses Pydantic models for type-safe data validation
+
+### Regex Fallback
+- **Secondary Method**: Falls back to regex parsing when JSON parsing fails
+- **Flexible Patterns**: Handles various LLM output formats and structures
+- **Content Cleaning**: Automatically removes section headers and formats content
+
+### Error Handling
+- **Retry Logic**: Automatic retry with exponential backoff for transient failures
+- **Error Categorization**: Intelligent error classification (rate limits, timeouts, authentication, etc.)
+- **User-Friendly Messages**: Clear error messages for better user experience
+- **Graceful Degradation**: Continues operation even when some components fail
+
+### Configuration Options
+```bash
+# Environment variables for error handling
+MAX_LLM_RETRIES=3              # Maximum retry attempts
+LLM_RETRY_DELAY=1.0            # Initial delay between retries (seconds)
+LLM_BACKOFF_FACTOR=2.0         # Exponential backoff multiplier
+LLM_MAX_DELAY=60.0             # Maximum delay between retries (seconds)
+ENABLE_RETRY_LOGIC=true        # Enable/disable retry logic
+STRUCTURED_PARSING_ENABLED=true # Enable structured parsing
+FALLBACK_TO_REGEX=true         # Enable regex fallback
+RESPONSE_VALIDATION_ENABLED=true # Enable response validation
+```
+
+### Data Models
+All LLM responses are parsed into structured Pydantic models:
+- `JobAssessment`: Core assessment with rating, strengths, gaps, recommendation
+- `ResumeImprovements`: Structured improvement suggestions
+- `CoverLetter`: Cover letter components
+- `InterviewQuestions`: Interview Q&A structure
+- `NextSteps`: Action plan structure
+- `AnalysisResult`: Complete analysis container
+- `ErrorInfo`: Structured error information
 
 ## Installation
 
@@ -48,6 +93,23 @@ cd job-application-agent
 ```bash
 pip install -e .
 ```
+
+**Key Dependencies:**
+- `pydantic>=2.0.0`: Structured data validation and parsing
+- `anthropic>=0.39.0`: Claude API integration
+- `requests>=2.32.0`: HTTP requests
+- `beautifulsoup4>=4.12.0`: Web scraping
+- `python-docx>=1.1.0`: Word document parsing
+- `rich>=13.7.0`: Beautiful CLI output
+- `python-dotenv>=1.0.0`: Environment variable management
+- `mcp>=1.0.0`: Model Context Protocol
+- `platformdirs>=4.0.0`: Cross-platform directory management
+- `cryptography>=41.0.0`: Encryption
+- `yubikey-manager>=5.0.0`: YubiKey support (optional)
+
+**Development Dependencies:**
+- `pytest>=7.0.0`: Testing framework
+- `pytest-asyncio>=0.21.0`: Async testing support
 
 3. Set up environment variables:
 ```bash
@@ -65,6 +127,18 @@ ANTHROPIC_API_KEY=your_anthropic_api_key_here
 
 # For Ollama (local models)
 OLLAMA_BASE_URL=http://localhost:11434
+
+# Error handling and retry settings (optional)
+MAX_LLM_RETRIES=3
+LLM_RETRY_DELAY=1.0
+LLM_BACKOFF_FACTOR=2.0
+LLM_MAX_DELAY=60.0
+ENABLE_RETRY_LOGIC=true
+
+# Structured parsing settings (optional)
+STRUCTURED_PARSING_ENABLED=true
+FALLBACK_TO_REGEX=true
+RESPONSE_VALIDATION_ENABLED=true
 ```
 
 ## Usage

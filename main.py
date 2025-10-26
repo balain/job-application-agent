@@ -162,7 +162,7 @@ Examples:
             console.print(f"[green]✓ Results also saved to: {args.output}[/green]")
         
         # Exit with appropriate code
-        if results['should_proceed']:
+        if results.should_proceed:
             console.print("\n[green]✓ Analysis complete - Application recommended![/green]")
             sys.exit(0)
         else:

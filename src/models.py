@@ -159,40 +159,6 @@ class NextSteps(BaseModel):
     model_config = ConfigDict(validate_assignment=True)
 
 
-class AnalysisResult(BaseModel):
-    """Complete analysis result containing all components."""
-    
-    assessment: JobAssessment = Field(
-        description="Job assessment results"
-    )
-    resume_improvements: Optional[ResumeImprovements] = Field(
-        default=None,
-        description="Resume improvement suggestions"
-    )
-    cover_letter: Optional[CoverLetter] = Field(
-        default=None,
-        description="Generated cover letter"
-    )
-    interview_questions: Optional[InterviewQuestions] = Field(
-        default=None,
-        description="Interview questions and answers"
-    )
-    next_steps: Optional[NextSteps] = Field(
-        default=None,
-        description="Action plan and next steps"
-    )
-    analysis_timestamp: datetime = Field(
-        default_factory=datetime.now,
-        description="When the analysis was performed"
-    )
-    raw_response: Optional[str] = Field(
-        default=None,
-        description="Raw LLM response for debugging"
-    )
-    
-    model_config = ConfigDict(validate_assignment=True)
-
-
 class ErrorInfo(BaseModel):
     """Error information for structured error handling."""
     
@@ -227,6 +193,49 @@ class ErrorInfo(BaseModel):
         default=0,
         ge=0,
         description="Number of retry attempts made"
+    )
+    
+    model_config = ConfigDict(validate_assignment=True)
+
+
+class AnalysisResult(BaseModel):
+    """Complete analysis result containing all components."""
+    
+    assessment: Optional[JobAssessment] = Field(
+        default=None,
+        description="Job assessment results"
+    )
+    resume_improvements: Optional[ResumeImprovements] = Field(
+        default=None,
+        description="Resume improvement suggestions"
+    )
+    cover_letter: Optional[CoverLetter] = Field(
+        default=None,
+        description="Generated cover letter"
+    )
+    interview_questions: Optional[InterviewQuestions] = Field(
+        default=None,
+        description="Interview questions and answers"
+    )
+    next_steps: Optional[NextSteps] = Field(
+        default=None,
+        description="Action plan and next steps"
+    )
+    should_proceed: bool = Field(
+        default=False,
+        description="Whether the candidate should proceed with the application"
+    )
+    error_info: Optional[ErrorInfo] = Field(
+        default=None,
+        description="Error information if analysis failed"
+    )
+    analysis_timestamp: datetime = Field(
+        default_factory=datetime.now,
+        description="When the analysis was performed"
+    )
+    raw_response: Optional[str] = Field(
+        default=None,
+        description="Raw LLM response for debugging"
     )
     
     model_config = ConfigDict(validate_assignment=True)

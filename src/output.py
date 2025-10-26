@@ -11,7 +11,7 @@ from rich.table import Table
 from rich.text import Text
 from rich.markdown import Markdown
 
-from .analyzer import AssessmentResult, ApplicationMaterials
+from .models import AnalysisResult, JobAssessment, ResumeImprovements, CoverLetter, InterviewQuestions, NextSteps
 
 console = Console(file=sys.stderr)
 
@@ -22,12 +22,12 @@ class OutputFormatter:
     def __init__(self, verbose: bool = False):
         self.verbose = verbose
     
-    def display_results(self, results: Dict[str, Any], output_format: str = "text") -> None:
+    def display_results(self, results: AnalysisResult, output_format: str = "text") -> None:
         """
         Display analysis results in the specified format.
         
         Args:
-            results: Analysis results dictionary
+            results: AnalysisResult object
             output_format: Output format ('text' or 'json')
         """
         if output_format == "json":
@@ -35,11 +35,19 @@ class OutputFormatter:
         else:
             self._display_text(results)
     
-    def _display_text(self, results: Dict[str, Any]) -> None:
+    def _display_text(self, results: AnalysisResult) -> None:
         """Display results in plain text format."""
-        assessment = results['assessment']
-        materials = results.get('materials')
-        should_proceed = results['should_proceed']
+        if results.error_info:
+            print("\n" + "="*80)
+            print("ANALYSIS ERROR")
+            print("="*80)
+            print(f"Error: {results.error_info.user_message}")
+            print(f"Category: {results.error_info.category}")
+            print(f"Confidence: {results.error_info.confidence}")
+            return
+        
+        assessment = results.assessment
+        should_proceed = results.should_proceed
         
         # Header
         print("\n" + "="*80)
@@ -53,12 +61,12 @@ class OutputFormatter:
         self._display_detailed_assessment_text(assessment)
         
         # Application Materials (if available)
-        if materials:
-            self._display_application_materials_text(materials)
+        if results.resume_improvements or results.cover_letter or results.interview_questions or results.next_steps:
+            self._display_application_materials_text(results)
         else:
             print("\nNo additional materials generated - application not recommended")
     
-    def _display_assessment_summary_text(self, assessment: AssessmentResult, should_proceed: bool) -> None:
+    def _display_assessment_summary_text(self, assessment: JobAssessment, should_proceed: bool) -> None:
         """Display assessment summary in plain text."""
         print("\nASSESSMENT SUMMARY")
         print("-" * 50)
@@ -66,7 +74,7 @@ class OutputFormatter:
         print(f"Recommendation: {assessment.recommendation}")
         print(f"Confidence Level: {assessment.confidence}")
     
-    def _display_assessment_summary(self, assessment: AssessmentResult, should_proceed: bool) -> None:
+    def _display_assessment_summary(self, assessment: JobAssessment, should_proceed: bool) -> None:
         """Display assessment summary."""
         # Rating with color coding
         rating_color = "green" if assessment.rating >= 8 else "yellow" if assessment.rating >= 6 else "red"
@@ -87,7 +95,7 @@ class OutputFormatter:
         
         console.print(table)
     
-    def _display_detailed_assessment_text(self, assessment: AssessmentResult) -> None:
+    def _display_detailed_assessment_text(self, assessment: JobAssessment) -> None:
         """Display detailed assessment breakdown in plain text."""
         print("\nDETAILED ASSESSMENT")
         print("=" * 50)
@@ -107,7 +115,7 @@ class OutputFormatter:
         print("-" * 25)
         print(assessment.missing_requirements)
     
-    def _display_detailed_assessment(self, assessment: AssessmentResult) -> None:
+    def _display_detailed_assessment(self, assessment: JobAssessment) -> None:
         """Display detailed assessment breakdown."""
         console.print("\n[bold cyan]DETAILED ASSESSMENT[/bold cyan]")
         
@@ -135,39 +143,84 @@ class OutputFormatter:
         )
         console.print(missing_panel)
     
-    def _display_application_materials_text(self, materials: ApplicationMaterials) -> None:
+    def _display_application_materials_text(self, results: AnalysisResult) -> None:
         """Display generated application materials in plain text."""
         print("\nAPPLICATION MATERIALS")
         print("=" * 50)
         
         # Resume Improvements
-        print("\nRESUME IMPROVEMENT SUGGESTIONS:")
-        print("-" * 35)
-        print(materials.resume_improvements)
+        if results.resume_improvements:
+            print("\nRESUME IMPROVEMENT SUGGESTIONS:")
+            print("-" * 35)
+            self._display_resume_improvements_text(results.resume_improvements)
         
         # Cover Letter
-        print("\nCOVER LETTER:")
-        print("-" * 15)
-        print(materials.cover_letter)
+        if results.cover_letter:
+            print("\nCOVER LETTER:")
+            print("-" * 15)
+            self._display_cover_letter_text(results.cover_letter)
         
         # Interview Questions
-        print("\nQUESTIONS TO ASK THE HIRING MANAGER:")
-        print("-" * 40)
-        print(materials.questions_for_employer)
-        
-        print("\nANTICIPATED INTERVIEW QUESTIONS:")
-        print("-" * 35)
-        print(materials.anticipated_questions)
-        
-        # Suggested Answers
-        print("\nSUGGESTED INTERVIEW ANSWERS:")
-        print("-" * 32)
-        print(materials.suggested_answers)
+        if results.interview_questions:
+            print("\nINTERVIEW QUESTIONS:")
+            print("-" * 20)
+            self._display_interview_questions_text(results.interview_questions)
         
         # Next Steps
-        print("\nNEXT STEPS ACTION PLAN:")
-        print("-" * 25)
-        print(materials.next_steps)
+        if results.next_steps:
+            print("\nNEXT STEPS ACTION PLAN:")
+            print("-" * 25)
+            self._display_next_steps_text(results.next_steps)
+    
+    def _display_resume_improvements_text(self, improvements: ResumeImprovements) -> None:
+        """Display resume improvements in text format."""
+        if improvements.keywords:
+            print("Keywords to add:", ", ".join(improvements.keywords))
+        if improvements.sections:
+            print("Sections to modify:", ", ".join(improvements.sections))
+        if improvements.formatting:
+            print("Formatting changes:", ", ".join(improvements.formatting))
+        if improvements.content:
+            print("Content changes:", ", ".join(improvements.content))
+        if improvements.priority:
+            print("Priority changes:", ", ".join(improvements.priority))
+        if improvements.quick_wins:
+            print("Quick wins:", ", ".join(improvements.quick_wins))
+    
+    def _display_cover_letter_text(self, cover_letter: CoverLetter) -> None:
+        """Display cover letter in text format."""
+        print(cover_letter.full_letter)
+    
+    def _display_interview_questions_text(self, questions: InterviewQuestions) -> None:
+        """Display interview questions in text format."""
+        print("QUESTIONS TO ASK THE HIRING MANAGER:")
+        for i, q in enumerate(questions.for_employer, 1):
+            print(f"{i}. {q}")
+        
+        print("\nANTICIPATED INTERVIEW QUESTIONS:")
+        for i, q in enumerate(questions.anticipated, 1):
+            print(f"{i}. {q}")
+        
+        print("\nSUGGESTED ANSWERS:")
+        for i, a in enumerate(questions.suggested_answers, 1):
+            print(f"{i}. {a}")
+    
+    def _display_next_steps_text(self, next_steps: NextSteps) -> None:
+        """Display next steps in text format."""
+        print("IMMEDIATE ACTIONS:")
+        for i, action in enumerate(next_steps.immediate, 1):
+            print(f"{i}. {action}")
+        
+        print("\nSHORT-TERM PREPARATION:")
+        for i, action in enumerate(next_steps.short_term, 1):
+            print(f"{i}. {action}")
+        
+        print("\nLONG-TERM DEVELOPMENT:")
+        for i, action in enumerate(next_steps.long_term, 1):
+            print(f"{i}. {action}")
+        
+        print(f"\nSTRATEGY: {next_steps.strategy}")
+        print(f"RISK MITIGATION: {next_steps.risk_mitigation}")
     
     def _display_application_materials(self, materials: ApplicationMaterials) -> None:
         """Display generated application materials."""
@@ -213,42 +266,20 @@ class OutputFormatter:
         )
         console.print(next_steps_panel)
     
-    def _display_json(self, results: Dict[str, Any]) -> None:
+    def _display_json(self, results: AnalysisResult) -> None:
         """Display results in JSON format."""
-        # Convert results to JSON-serializable format
-        json_results = {
-            "assessment": {
-                "rating": results['assessment'].rating,
-                "strengths": results['assessment'].strengths,
-                "gaps": results['assessment'].gaps,
-                "missing_requirements": results['assessment'].missing_requirements,
-                "recommendation": results['assessment'].recommendation,
-                "confidence": results['assessment'].confidence
-            },
-            "should_proceed": results['should_proceed']
-        }
-        
-        if results.get('materials'):
-            json_results["materials"] = {
-                "resume_improvements": results['materials'].resume_improvements,
-                "cover_letter": results['materials'].cover_letter,
-                "questions_for_employer": results['materials'].questions_for_employer,
-                "anticipated_questions": results['materials'].anticipated_questions,
-                "suggested_answers": results['materials'].suggested_answers,
-                "next_steps": results['materials'].next_steps
-            }
-        
-        console.print(json.dumps(json_results, indent=2))
+        json_results = results.model_dump()
+        console.print(json.dumps(json_results, indent=2, default=str))
         
         # Automatically create Markdown file when using JSON console output
         self._create_auto_markdown(json_results)
     
-    def save_results(self, results: Dict[str, Any], output_file: str) -> None:
+    def save_results(self, results: AnalysisResult, output_file: str) -> None:
         """
         Save results to a file.
         
         Args:
-            results: Analysis results dictionary
+            results: AnalysisResult object
             output_file: Output file path
         """
         output_path = Path(output_file)
@@ -257,34 +288,14 @@ class OutputFormatter:
         # This ensures consistent, parseable output for programmatic use
         self._save_json(results, output_file)
     
-    def _save_json(self, results: Dict[str, Any], output_file: str) -> None:
+    def _save_json(self, results: AnalysisResult, output_file: str) -> None:
         """Save results as JSON file."""
-        json_results = {
-            "assessment": {
-                "rating": results['assessment'].rating,
-                "strengths": results['assessment'].strengths,
-                "gaps": results['assessment'].gaps,
-                "missing_requirements": results['assessment'].missing_requirements,
-                "recommendation": results['assessment'].recommendation,
-                "confidence": results['assessment'].confidence
-            },
-            "should_proceed": results['should_proceed']
-        }
-        
-        if results.get('materials'):
-            json_results["materials"] = {
-                "resume_improvements": results['materials'].resume_improvements,
-                "cover_letter": results['materials'].cover_letter,
-                "questions_for_employer": results['materials'].questions_for_employer,
-                "anticipated_questions": results['materials'].anticipated_questions,
-                "suggested_answers": results['materials'].suggested_answers,
-                "next_steps": results['materials'].next_steps
-            }
+        json_results = results.model_dump()
         
         with open(output_file, 'w', encoding='utf-8') as f:
-            json.dump(json_results, f, indent=2, ensure_ascii=False)
+            json.dump(json_results, f, indent=2, ensure_ascii=False, default=str)
         
-            console.print(f"[green]Results saved to: {output_file}[/green]")
+        console.print(f"[green]Results saved to: {output_file}[/green]")
         
         # Automatically create Markdown file from JSON
         self._create_markdown_from_json(json_results, output_file)
@@ -301,48 +312,94 @@ class OutputFormatter:
             f.write("# Job Application Analysis Results\n\n")
             f.write(f"*Generated on: {self._get_timestamp()}*\n\n")
             
+            # Handle error case
+            if json_results.get('error_info'):
+                f.write("## Analysis Error\n\n")
+                error_info = json_results['error_info']
+                f.write(f"**Error:** {error_info['user_message']}\n\n")
+                f.write(f"**Category:** {error_info['category']}\n\n")
+                f.write(f"**Confidence:** {error_info['confidence']}\n\n")
+                return
+            
             # Assessment Summary
-            assessment = json_results['assessment']
-            f.write("## Assessment Summary\n\n")
-            f.write(f"**Suitability Rating:** {assessment['rating']}/10\n\n")
-            f.write(f"**Recommendation:** {assessment['recommendation']}\n\n")
-            f.write(f"**Confidence Level:** {assessment['confidence']}\n\n")
-            
-            # Detailed Assessment
-            f.write("## Detailed Assessment\n\n")
-            
-            f.write("### Strengths\n\n")
-            f.write(f"{assessment['strengths']}\n\n")
-            
-            f.write("### Areas for Improvement\n\n")
-            f.write(f"{assessment['gaps']}\n\n")
-            
-            f.write("### Missing Requirements\n\n")
-            f.write(f"{assessment['missing_requirements']}\n\n")
+            if json_results.get('assessment'):
+                assessment = json_results['assessment']
+                f.write("## Assessment Summary\n\n")
+                f.write(f"**Suitability Rating:** {assessment['rating']}/10\n\n")
+                f.write(f"**Recommendation:** {assessment['recommendation']}\n\n")
+                f.write(f"**Confidence Level:** {assessment['confidence']}\n\n")
+                
+                # Detailed Assessment
+                f.write("## Detailed Assessment\n\n")
+                
+                f.write("### Strengths\n\n")
+                f.write(f"{assessment['strengths']}\n\n")
+                
+                f.write("### Areas for Improvement\n\n")
+                f.write(f"{assessment['gaps']}\n\n")
+                
+                f.write("### Missing Requirements\n\n")
+                f.write(f"{assessment['missing_requirements']}\n\n")
             
             # Application Materials (if available)
-            if json_results.get('materials'):
-                materials = json_results['materials']
+            if json_results.get('resume_improvements') or json_results.get('cover_letter') or json_results.get('interview_questions') or json_results.get('next_steps'):
                 f.write("## Application Materials\n\n")
                 
-                f.write("### Resume Improvement Suggestions\n\n")
-                f.write(f"{materials['resume_improvements']}\n\n")
+                if json_results.get('resume_improvements'):
+                    f.write("### Resume Improvement Suggestions\n\n")
+                    improvements = json_results['resume_improvements']
+                    if improvements.get('keywords'):
+                        f.write("**Keywords to add:** " + ", ".join(improvements['keywords']) + "\n\n")
+                    if improvements.get('priority'):
+                        f.write("**Priority changes:**\n")
+                        for item in improvements['priority']:
+                            f.write(f"- {item}\n")
+                        f.write("\n")
                 
-                f.write("### Cover Letter\n\n")
-                f.write(f"{materials['cover_letter']}\n\n")
+                if json_results.get('cover_letter'):
+                    f.write("### Cover Letter\n\n")
+                    f.write(f"{json_results['cover_letter']['full_letter']}\n\n")
                 
-                f.write("### Interview Questions\n\n")
-                f.write("#### Questions to Ask the Hiring Manager\n\n")
-                f.write(f"{materials['questions_for_employer']}\n\n")
+                if json_results.get('interview_questions'):
+                    f.write("### Interview Questions\n\n")
+                    questions = json_results['interview_questions']
+                    
+                    f.write("#### Questions to Ask the Hiring Manager\n\n")
+                    for i, q in enumerate(questions['for_employer'], 1):
+                        f.write(f"{i}. {q}\n")
+                    f.write("\n")
+                    
+                    f.write("#### Anticipated Interview Questions\n\n")
+                    for i, q in enumerate(questions['anticipated'], 1):
+                        f.write(f"{i}. {q}\n")
+                    f.write("\n")
+                    
+                    f.write("#### Suggested Answers\n\n")
+                    for i, a in enumerate(questions['suggested_answers'], 1):
+                        f.write(f"{i}. {a}\n")
+                    f.write("\n")
                 
-                f.write("#### Anticipated Interview Questions\n\n")
-                f.write(f"{materials['anticipated_questions']}\n\n")
-                
-                f.write("#### Suggested Answers\n\n")
-                f.write(f"{materials['suggested_answers']}\n\n")
-                
-                f.write("### Next Steps Action Plan\n\n")
-                f.write(f"{materials['next_steps']}\n\n")
+                if json_results.get('next_steps'):
+                    f.write("### Next Steps Action Plan\n\n")
+                    next_steps = json_results['next_steps']
+                    
+                    f.write("#### Immediate Actions\n\n")
+                    for i, action in enumerate(next_steps['immediate'], 1):
+                        f.write(f"{i}. {action}\n")
+                    f.write("\n")
+                    
+                    f.write("#### Short-term Preparation\n\n")
+                    for i, action in enumerate(next_steps['short_term'], 1):
+                        f.write(f"{i}. {action}\n")
+                    f.write("\n")
+                    
+                    f.write("#### Long-term Development\n\n")
+                    for i, action in enumerate(next_steps['long_term'], 1):
+                        f.write(f"{i}. {action}\n")
+                    f.write("\n")
+                    
+                    f.write(f"**Strategy:** {next_steps['strategy']}\n\n")
+                    f.write(f"**Risk Mitigation:** {next_steps['risk_mitigation']}\n\n")
             else:
                 f.write("## Application Materials\n\n")
                 f.write("*No additional materials generated - application not recommended*\n\n")
@@ -351,7 +408,7 @@ class OutputFormatter:
             f.write("---\n\n")
             f.write("*This analysis was generated by the Job Application Agent*\n")
         
-            console.print(f"[green]Markdown report created: {markdown_file}[/green]")
+        console.print(f"[green]Markdown report created: {markdown_file}[/green]")
     
     def _create_auto_markdown(self, json_results: Dict[str, Any]) -> None:
         """Create an auto-generated Markdown file when using JSON console output."""

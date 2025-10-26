@@ -24,20 +24,25 @@ JOB DESCRIPTION:
 CANDIDATE'S RESUME:
 {resume}
 
-Please provide a comprehensive assessment with the following structure:
+Please provide your assessment in the following JSON format:
 
-1. SUITABILITY RATING: Rate the candidate's fit for this position on a scale of 1-10 (1 = not a fit, 10 = perfect fit)
+```json
+{{
+    "rating": <integer between 1-10>,
+    "strengths": "<detailed analysis of candidate strengths>",
+    "gaps": "<areas where candidate lacks compared to requirements>",
+    "missing_requirements": "<key requirements completely absent from candidate's background>",
+    "recommendation": "<Yes/No/Unknown>",
+    "confidence": "<High/Medium/Low>"
+}}
+```
 
-2. DETAILED ANALYSIS:
-   - STRENGTHS: What makes this candidate a good fit for the role
-   - GAPS: What the candidate is missing or lacks compared to requirements
-   - MISSING REQUIREMENTS: What key requirements are completely absent from the candidate's background
-
-3. RECOMMENDATION: Should the candidate proceed with this application? (Yes/No)
-
-4. CONFIDENCE LEVEL: How confident are you in this assessment? (High/Medium/Low)
-
-Please be specific and reference concrete examples from both the job description and resume in your analysis."""
+Guidelines:
+- Rating: 1 = not a fit, 10 = perfect fit
+- Recommendation: "Yes" if candidate should proceed, "No" if not recommended, "Unknown" if unclear
+- Confidence: "High" for clear-cut cases, "Medium" for some uncertainty, "Low" for ambiguous situations
+- Be specific and reference concrete examples from both the job description and resume
+- Keep responses concise but comprehensive"""
 
     @staticmethod
     def get_resume_improvement_prompt(job_description: str, resume: str, assessment: str) -> str:
@@ -63,19 +68,27 @@ CURRENT RESUME:
 PREVIOUS ASSESSMENT:
 {assessment}
 
-Please provide:
+Please provide your recommendations in the following JSON format:
 
-1. RESUME IMPROVEMENTS: Specific, actionable suggestions for:
-   - Skills to highlight or add
-   - Experience to emphasize or reframe
-   - Keywords to include
-   - Formatting or structure changes
+```json
+{{
+    "keywords": ["<keyword1>", "<keyword2>", "<keyword3>"],
+    "sections": ["<section1>", "<section2>", "<section3>"],
+    "formatting": ["<formatting1>", "<formatting2>", "<formatting3>"],
+    "content": ["<content1>", "<content2>", "<content3>"],
+    "priority": ["<high_priority_change1>", "<high_priority_change2>", "<high_priority_change3>"],
+    "quick_wins": ["<quick_win1>", "<quick_win2>", "<quick_win3>"]
+}}
+```
 
-2. PRIORITY CHANGES: The top 3 most important changes that would have the biggest impact
-
-3. QUICK WINS: Simple changes that can be made immediately
-
-Focus on making the resume more aligned with the job requirements while maintaining honesty and accuracy."""
+Guidelines:
+- Keywords: Important terms from job description to include
+- Sections: Resume sections to add, modify, or reorganize
+- Formatting: Visual or structural improvements
+- Content: Specific content changes or additions
+- Priority: Top 3 most impactful changes
+- Quick wins: Simple changes that can be made immediately
+- Focus on making the resume more aligned with job requirements while maintaining honesty"""
 
     @staticmethod
     def get_cover_letter_prompt(job_description: str, resume: str, assessment: str) -> str:
@@ -101,16 +114,24 @@ CANDIDATE'S RESUME:
 ASSESSMENT:
 {assessment}
 
-The cover letter should:
+Please provide the cover letter in the following JSON format:
 
-1. Be professional and engaging (3-4 paragraphs)
-2. Highlight the most relevant qualifications and experiences
-3. Address any gaps or concerns from the assessment
-4. Show enthusiasm for the role and company
-5. Include a strong opening and closing
-6. Be tailored specifically to this job description
+```json
+{{
+    "opening": "<engaging opening paragraph>",
+    "body": "<main content highlighting relevant qualifications>",
+    "closing": "<professional closing paragraph>",
+    "full_letter": "<complete cover letter ready to send>"
+}}
+```
 
-Format the cover letter as a complete, ready-to-send document."""
+Guidelines:
+- Opening: Engaging first paragraph that shows enthusiasm
+- Body: 2-3 paragraphs highlighting most relevant qualifications and addressing gaps
+- Closing: Professional closing with call to action
+- Full letter: Complete, formatted cover letter ready to send
+- Be professional, engaging, and tailored specifically to this job
+- Address any concerns from the assessment while maintaining honesty"""
 
     @staticmethod
     def get_interview_questions_prompt(job_description: str, resume: str, assessment: str) -> str:
@@ -136,24 +157,22 @@ CANDIDATE'S RESUME:
 ASSESSMENT:
 {assessment}
 
-Please provide:
+Please provide your interview preparation in the following JSON format:
 
-1. QUESTIONS TO ASK THE HIRING MANAGER (5-7 questions):
-   - Questions about the role, team, company culture
-   - Questions that show interest and preparation
-   - Questions that help evaluate if this is a good fit
+```json
+{{
+    "for_employer": ["<question1>", "<question2>", "<question3>", "<question4>", "<question5>"],
+    "anticipated": ["<question1>", "<question2>", "<question3>", "<question4>", "<question5>"],
+    "suggested_answers": ["<answer1>", "<answer2>", "<answer3>", "<answer4>", "<answer5>"]
+}}
+```
 
-2. ANTICIPATED INTERVIEW QUESTIONS (5-7 questions):
-   - Questions the interviewer is likely to ask
-   - Include both technical and behavioral questions
-   - Focus on areas where the candidate might be challenged
-
-3. SUGGESTED ANSWERS:
-   - Provide strong, specific answers for each anticipated question
-   - Use examples from the candidate's background
-   - Address any potential weaknesses identified in the assessment
-
-Make the questions and answers specific to this role and candidate."""
+Guidelines:
+- For employer: 5-7 questions to ask the hiring manager about role, team, company culture
+- Anticipated: 5-7 questions the interviewer is likely to ask (technical and behavioral)
+- Suggested answers: Strong, specific answers for each anticipated question using candidate's background
+- Make questions and answers specific to this role and candidate
+- Address potential weaknesses identified in the assessment"""
 
     @staticmethod
     def get_next_steps_prompt(job_description: str, resume: str, assessment: str) -> str:
@@ -179,30 +198,22 @@ CANDIDATE'S RESUME:
 ASSESSMENT:
 {assessment}
 
-Please provide:
+Please provide your action plan in the following JSON format:
 
-1. IMMEDIATE ACTIONS (next 1-2 days):
-   - Resume updates to make
-   - Application materials to prepare
-   - Research to conduct
+```json
+{{
+    "immediate": ["<action1>", "<action2>", "<action3>"],
+    "short_term": ["<action1>", "<action2>", "<action3>"],
+    "long_term": ["<action1>", "<action2>", "<action3>"],
+    "strategy": "<application strategy and timeline>",
+    "risk_mitigation": "<potential challenges and backup plans>"
+}}
+```
 
-2. SHORT-TERM PREPARATION (next week):
-   - Skills to practice or learn
-   - Networking opportunities
-   - Application strategy
-
-3. LONG-TERM DEVELOPMENT (next month):
-   - Skills to develop for this role
-   - Experience to gain
-   - Career development steps
-
-4. APPLICATION STRATEGY:
-   - Best way to apply (direct, referral, etc.)
-   - Timeline for application
-   - Follow-up approach
-
-5. RISK MITIGATION:
-   - Potential challenges and how to address them
-   - Backup plans if this application doesn't work out
-
-Make the recommendations specific, actionable, and realistic."""
+Guidelines:
+- Immediate: Actions for next 1-2 days (resume updates, application prep, research)
+- Short term: Preparation for next week (skills practice, networking, application strategy)
+- Long term: Development for next month (skills to develop, experience to gain)
+- Strategy: Best way to apply, timeline, follow-up approach
+- Risk mitigation: Potential challenges and backup plans
+- Make recommendations specific, actionable, and realistic"""
