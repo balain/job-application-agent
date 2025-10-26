@@ -222,50 +222,6 @@ class OutputFormatter:
         print(f"\nSTRATEGY: {next_steps.strategy}")
         print(f"RISK MITIGATION: {next_steps.risk_mitigation}")
     
-    def _display_application_materials(self, materials: ApplicationMaterials) -> None:
-        """Display generated application materials."""
-        console.print("\n[bold cyan]APPLICATION MATERIALS[/bold cyan]")
-        
-        # Resume Improvements
-        resume_panel = Panel(
-            materials.resume_improvements,
-            title="[blue]Resume Improvement Suggestions[/blue]",
-            border_style="blue"
-        )
-        console.print(resume_panel)
-        
-        # Cover Letter
-        cover_letter_panel = Panel(
-            materials.cover_letter,
-            title="[blue]Cover Letter[/blue]",
-            border_style="blue"
-        )
-        console.print(cover_letter_panel)
-        
-        # Interview Questions
-        questions_panel = Panel(
-            f"{materials.questions_for_employer}\n\n{materials.anticipated_questions}",
-            title="[blue]Interview Questions[/blue]",
-            border_style="blue"
-        )
-        console.print(questions_panel)
-        
-        # Suggested Answers
-        answers_panel = Panel(
-            materials.suggested_answers,
-            title="[blue]Suggested Interview Answers[/blue]",
-            border_style="blue"
-        )
-        console.print(answers_panel)
-        
-        # Next Steps
-        next_steps_panel = Panel(
-            materials.next_steps,
-            title="[blue]Next Steps Action Plan[/blue]",
-            border_style="blue"
-        )
-        console.print(next_steps_panel)
-    
     def _display_json(self, results: AnalysisResult) -> None:
         """Display results in JSON format."""
         json_results = results.model_dump()

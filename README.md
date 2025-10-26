@@ -85,7 +85,7 @@ All LLM responses are parsed into structured Pydantic models:
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/username/job-application-agent.git
+git clone https://github.com/balain/job-application-agent.git
 cd job-application-agent
 ```
 
