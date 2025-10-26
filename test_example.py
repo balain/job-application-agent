@@ -3,12 +3,12 @@
 
 import os
 import tempfile
-from pathlib import Path
+
 
 # Create sample files for testing
 def create_sample_files():
     """Create sample job description and resume files for testing."""
-    
+
     # Sample job description
     job_description = """
 Software Engineer - Full Stack Developer
@@ -90,34 +90,36 @@ PROJECTS
 """
 
     # Create temporary files
-    with tempfile.NamedTemporaryFile(mode='w', suffix='.txt', delete=False) as f:
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".txt", delete=False) as f:
         f.write(job_description)
         job_file = f.name
-    
-    with tempfile.NamedTemporaryFile(mode='w', suffix='.txt', delete=False) as f:
+
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".txt", delete=False) as f:
         f.write(resume)
         resume_file = f.name
-    
+
     return job_file, resume_file
+
 
 def main():
     """Run the example test."""
     print("Creating sample files...")
     job_file, resume_file = create_sample_files()
-    
+
     print(f"Job description file: {job_file}")
     print(f"Resume file: {resume_file}")
-    
+
     print("\nTo test the agent, run:")
     print(f"python main.py --job '{job_file}' --resume '{resume_file}'")
     print("\nNote: You'll need to set up your API keys in a .env file first.")
-    
+
     # Clean up
     try:
         os.unlink(job_file)
         os.unlink(resume_file)
-    except:
+    except Exception:
         pass
+
 
 if __name__ == "__main__":
     main()

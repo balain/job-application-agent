@@ -37,6 +37,8 @@ The Job Application Agent follows a structured workflow to analyze job applicati
 - **MCP Server**: Can run as Model Context Protocol server for AI assistant integration
 - **Auto Markdown**: Automatically generates Markdown reports when using JSON output
 - **Beautiful CLI**: Rich console output with progress indicators and formatted results
+- **Application Tracking**: SQLite database for tracking job applications, status updates, and analytics
+- **Analytics Dashboard**: Comprehensive insights into application success rates and patterns
 
 ## Structured Output Parsing
 
@@ -81,6 +83,59 @@ All LLM responses are parsed into structured Pydantic models:
 - `AnalysisResult`: Complete analysis container
 - `ErrorInfo`: Structured error information
 
+## Application Tracking Database
+
+The Job Application Agent now includes a comprehensive application tracking system using SQLite for local data storage:
+
+### Features
+
+- **Application Management**: Track job applications with company, position, and status information
+- **Status Updates**: Update application status throughout the hiring process
+- **Analytics Dashboard**: View success rates, application patterns, and insights
+- **Data Export**: Export all application data to JSON for external use
+- **Multi-User Support**: Separate data for different users based on email addresses
+
+### Database Schema
+
+The system tracks:
+- **Persons**: User profiles with name and email
+- **Companies**: Company information including industry, size, and location
+- **Applications**: Job applications with status, dates, and notes
+- **Analysis Results**: AI analysis results linked to applications
+- **Interviews**: Interview tracking with questions and outcomes
+- **Analytics Events**: Usage tracking for insights
+
+### CLI Commands
+
+```bash
+# Track an application during analysis
+python main.py --job job.txt --resume resume.docx --track --email "user@example.com" --name "Your Name"
+
+# List all tracked applications
+python main.py --list-applications
+
+# Update application status
+python main.py --update-status "under_review" --application-id 1
+
+# View analytics dashboard
+python main.py --analytics
+
+# Export all data
+python main.py --export-data applications.json
+```
+
+### Application Statuses
+
+- `draft`: Application being prepared
+- `applied`: Application submitted
+- `under_review`: Application under review
+- `interview_scheduled`: Interview scheduled
+- `interview_completed`: Interview completed
+- `offer_received`: Job offer received
+- `rejected`: Application rejected
+- `withdrawn`: Application withdrawn
+- `accepted`: Job offer accepted
+
 ## Installation
 
 1. Clone the repository:
@@ -96,6 +151,7 @@ pip install -e .
 
 **Key Dependencies:**
 - `pydantic>=2.0.0`: Structured data validation and parsing
+- `sqlalchemy>=2.0.0`: Database ORM for application tracking
 - `anthropic>=0.39.0`: Claude API integration
 - `requests>=2.32.0`: HTTP requests
 - `beautifulsoup4>=4.12.0`: Web scraping
@@ -165,6 +221,31 @@ python main.py --job job.txt --resume resume.docx
 python main.py --job job.txt --resume resume.docx --format json
 ```
 
+### Application Tracking Usage
+
+```bash
+# Track an application during analysis
+python main.py --job job.txt --resume resume.docx --track --email "user@example.com" --name "Your Name"
+
+# List all tracked applications
+python main.py --list-applications
+
+# Update application status
+python main.py --update-status "under_review" --application-id 1
+
+# Delete an application and all related records (with confirmation)
+python main.py --delete-application 1
+
+# Delete without confirmation prompt (use with caution)
+python main.py --delete-application 1 --force-delete
+
+# View analytics dashboard
+python main.py --analytics
+
+# Export all application data
+python main.py --export-data applications.json
+```
+
 ### Command Line Options
 
 - `--job, -j`: Job description file path or URL (required)
@@ -176,6 +257,18 @@ python main.py --job job.txt --resume resume.docx --format json
 - `--clear-cache`: Clear resume cache and exit
 - `--cache-stats`: Show cache statistics and exit
 - `--mcp-server`: Run as MCP server for AI assistant integration
+
+**Application Tracking Options:**
+- `--track`: Track this application in the database
+- `--email`: Email address for application tracking (required with --track)
+- `--name`: Your name for application tracking (required with --track)
+- `--list-applications`: List all tracked applications
+- `--update-status`: Update application status (draft, applied, under_review, etc.)
+- `--application-id`: Application ID for status updates
+- `--delete-application`: Delete an application and all related records (requires confirmation)
+- `--force-delete`: Skip confirmation prompt when deleting applications (use with caution)
+- `--analytics`: Show application analytics and insights
+- `--export-data`: Export all application data to JSON file
 
 ## Supported Formats
 

@@ -3,16 +3,16 @@
 
 class PromptTemplates:
     """Collection of prompt templates for the job application agent."""
-    
+
     @staticmethod
     def get_assessment_prompt(job_description: str, resume: str) -> str:
         """
         Generate prompt for initial job suitability assessment.
-        
+
         Args:
             job_description: The job description text
             resume: The resume text
-            
+
         Returns:
             Formatted prompt string
         """
@@ -45,15 +45,17 @@ Guidelines:
 - Keep responses concise but comprehensive"""
 
     @staticmethod
-    def get_resume_improvement_prompt(job_description: str, resume: str, assessment: str) -> str:
+    def get_resume_improvement_prompt(
+        job_description: str, resume: str, assessment: str
+    ) -> str:
         """
         Generate prompt for resume improvement suggestions.
-        
+
         Args:
             job_description: The job description text
             resume: The resume text
             assessment: The previous assessment results
-            
+
         Returns:
             Formatted prompt string
         """
@@ -91,15 +93,17 @@ Guidelines:
 - Focus on making the resume more aligned with job requirements while maintaining honesty"""
 
     @staticmethod
-    def get_cover_letter_prompt(job_description: str, resume: str, assessment: str) -> str:
+    def get_cover_letter_prompt(
+        job_description: str, resume: str, assessment: str
+    ) -> str:
         """
         Generate prompt for cover letter creation.
-        
+
         Args:
             job_description: The job description text
             resume: The resume text
             assessment: The previous assessment results
-            
+
         Returns:
             Formatted prompt string
         """
@@ -134,15 +138,17 @@ Guidelines:
 - Address any concerns from the assessment while maintaining honesty"""
 
     @staticmethod
-    def get_interview_questions_prompt(job_description: str, resume: str, assessment: str) -> str:
+    def get_interview_questions_prompt(
+        job_description: str, resume: str, assessment: str
+    ) -> str:
         """
         Generate prompt for interview question preparation.
-        
+
         Args:
             job_description: The job description text
             resume: The resume text
             assessment: The previous assessment results
-            
+
         Returns:
             Formatted prompt string
         """
@@ -175,15 +181,17 @@ Guidelines:
 - Address potential weaknesses identified in the assessment"""
 
     @staticmethod
-    def get_next_steps_prompt(job_description: str, resume: str, assessment: str) -> str:
+    def get_next_steps_prompt(
+        job_description: str, resume: str, assessment: str
+    ) -> str:
         """
         Generate prompt for next steps recommendations.
-        
+
         Args:
             job_description: The job description text
             resume: The resume text
             assessment: The previous assessment results
-            
+
         Returns:
             Formatted prompt string
         """
@@ -202,18 +210,18 @@ Please provide your action plan in the following JSON format:
 
 ```json
 {{
-    "immediate": ["<action1>", "<action2>", "<action3>"],
-    "short_term": ["<action1>", "<action2>", "<action3>"],
-    "long_term": ["<action1>", "<action2>", "<action3>"],
-    "strategy": "<application strategy and timeline>",
-    "risk_mitigation": "<potential challenges and backup plans>"
+    "immediate_actions": ["<action1>", "<action2>", "<action3>"],
+    "short_term_preparation": ["<action1>", "<action2>", "<action3>"],
+    "long_term_development": ["<action1>", "<action2>", "<action3>"],
+    "application_strategy": ["<strategy1>", "<strategy2>"],
+    "risk_mitigation": ["<challenge1 and solution1>", "<challenge2 and solution2>"]
 }}
 ```
 
 Guidelines:
-- Immediate: Actions for next 1-2 days (resume updates, application prep, research)
-- Short term: Preparation for next week (skills practice, networking, application strategy)
-- Long term: Development for next month (skills to develop, experience to gain)
-- Strategy: Best way to apply, timeline, follow-up approach
-- Risk mitigation: Potential challenges and backup plans
+- immediate_actions: Actions for next 1-2 days (resume updates, application prep, research)
+- short_term_preparation: Preparation for next week (skills practice, networking, application strategy)
+- long_term_development: Development for next month (skills to develop, experience to gain)
+- application_strategy: Best way to apply, timeline, follow-up approach
+- risk_mitigation: Potential challenges and backup plans
 - Make recommendations specific, actionable, and realistic"""
