@@ -82,6 +82,12 @@ Examples:
     )
     
     parser.add_argument(
+        "--export-cache",
+        metavar="OUTPUT",
+        help="Export all cached data to JSON file"
+    )
+    
+    parser.add_argument(
         "--mcp-server",
         action="store_true",
         help="Run as MCP server for AI assistant integration"
@@ -96,13 +102,12 @@ Examples:
             console.print("[green]Cache cleared successfully[/green]")
             sys.exit(0)
         
+        if args.export_cache:
+            resume_cache.export_cache(args.export_cache)
+            sys.exit(0)
+        
         if args.cache_stats:
-            stats = resume_cache.get_cache_stats()
-            console.print("\n[bold blue]Cache Statistics[/bold blue]")
-            console.print(f"Total entries: {stats['total_entries']}")
-            console.print(f"Resume entries: {stats['resume_entries']}")
-            console.print(f"Cache file size: {stats['cache_file_size']} bytes")
-            console.print(f"Cache directory: {stats['cache_directory']}")
+            resume_cache.display_cache_info()
             sys.exit(0)
         
         if args.mcp_server:

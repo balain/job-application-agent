@@ -1,8 +1,8 @@
-# LangChain & LangGraph Integration Guide
+# LangChain Integration & Advanced AI Features
 
 ## Overview
 
-This document outlines how to integrate LangChain and LangGraph into existing phases to improve reliability, maintainability, and capabilities of the Job Application Agent.
+Integrate LangChain and LangGraph to enhance reliability, maintainability, and capabilities. This focuses on structured output parsing, prompt management, error handling, caching, observability, and advanced AI workflows using LangChain's ecosystem.
 
 ## Why LangChain/LangGraph?
 
