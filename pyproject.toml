@@ -1,6 +1,6 @@
 [project]
 name = "job-application-agent"
-version = "0.1.0"
+version = "0.2.0"
 description = "AI agent to review and assess fitness for posted job description."
 readme = "README.md"
 requires-python = ">=3.13"
@@ -17,6 +17,7 @@ dependencies = [
     "yubikey-manager>=5.0.0", # YubiKey support (optional)
     "pydantic>=2.0.0", # Structured data validation
     "sqlalchemy>=2.0.0", # Database ORM
+    "pypdf>=3.0.0", # PDF parsing for resume analysis
 ]
 
 [project.optional-dependencies]
@@ -33,4 +34,10 @@ job-agent = "main:main"
 filterwarnings = [
     "ignore::DeprecationWarning:sqlalchemy.*",
     "ignore::DeprecationWarning:datetime.datetime.utcnow",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.4.2",
+    "pytest-asyncio>=1.2.0",
 ]

@@ -39,6 +39,8 @@ The Job Application Agent follows a structured workflow to analyze job applicati
 - **Beautiful CLI**: Rich console output with progress indicators and formatted results
 - **Application Tracking**: SQLite database for tracking job applications, status updates, and analytics
 - **Analytics Dashboard**: Comprehensive insights into application success rates and patterns
+- **Resume Optimization**: ATS compatibility analysis, resume scoring, and improvement recommendations
+- **Career Analytics**: Career progression tracking, industry trend analysis, and personalized recommendations
 
 ## Structured Output Parsing
 
@@ -83,6 +85,87 @@ All LLM responses are parsed into structured Pydantic models:
 - `AnalysisResult`: Complete analysis container
 - `ErrorInfo`: Structured error information
 
+## Resume Optimization & ATS Analysis
+
+The Job Application Agent now includes comprehensive resume optimization features:
+
+### ATS Compatibility Analysis
+- **File Format Support**: PDF, DOCX, DOC, and TXT resume parsing
+- **ATS Issue Detection**: Identifies problematic elements (tables, images, headers/footers)
+- **Compatibility Scoring**: Rates ATS compatibility from 0-100%
+- **Issue Categorization**: Critical, High, Medium, Low severity levels
+- **Actionable Fixes**: Specific recommendations for each issue
+
+### Resume Scoring System
+- **Comprehensive Scoring**: 6-component scoring system (ATS, Content, Formatting, Keywords, Experience, Skills)
+- **Weighted Scoring**: Configurable weights for different components
+- **Job-Specific Analysis**: Keyword matching against job descriptions
+- **Experience Evaluation**: Years of experience, leadership roles, quantified achievements
+- **Skills Assessment**: Technical skills, soft skills, certifications, tools
+
+### Optimization Recommendations
+- **Priority Fixes**: Critical issues that must be addressed
+- **Content Improvements**: Suggestions for better content structure
+- **Formatting Suggestions**: ATS-friendly formatting recommendations
+- **Keyword Additions**: Missing keywords from job descriptions
+- **Section Recommendations**: Specific feedback for each resume section
+
+### CLI Commands
+```bash
+# Analyze resume for ATS compatibility
+python main.py --analyze-resume resume.pdf
+
+# Analyze with job description for keyword matching
+python main.py --analyze-resume resume.pdf --job job.txt
+
+# Calculate comprehensive resume score
+python main.py --score-resume resume.pdf --job job.txt
+
+# Save results to file
+python main.py --analyze-resume resume.pdf --optimization-output results.json
+```
+
+## Career Analytics & Insights
+
+The Job Application Agent includes comprehensive career analytics to help you understand your professional trajectory and make informed career decisions:
+
+### Features
+
+- **Career Progression Tracking**: Analyze your current career stage and progression path
+- **Industry Trend Analysis**: Track skill demand trends and industry growth patterns
+- **Personalized Recommendations**: Get tailored advice based on your profile and market trends
+- **Competitive Analysis**: Understand your market position and competitive advantages
+- **Salary Benchmarking**: Compare your compensation against industry standards
+- **Skill Gap Analysis**: Identify areas for professional development
+
+### Career Analytics Usage
+
+```bash
+# Analyze career progression
+python main.py --analyze-career-progression --resume resume.pdf
+
+# Get industry trend insights
+python main.py --analyze-industry-trends --skills "Python,JavaScript,React"
+
+# Generate personalized recommendations
+python main.py --generate-recommendations --resume resume.pdf --current-title "Software Developer"
+
+# Create comprehensive analytics dashboard
+python main.py --create-analytics-dashboard --resume resume.pdf --skills "Python,JavaScript"
+
+# Export analytics data
+python main.py --export-analytics --output analytics.json
+```
+
+### Analytics Dashboard
+
+The analytics dashboard provides:
+- **Career Score**: Overall career health and progression metrics
+- **Skill Trends**: Demand analysis for your technical skills
+- **Industry Insights**: Growth patterns and opportunities in your field
+- **Recommendations**: Personalized action items for career growth
+- **Competitive Position**: Market analysis and differentiation strategies
+
 ## Application Tracking Database
 
 The Job Application Agent now includes a comprehensive application tracking system using SQLite for local data storage:
@@ -122,6 +205,13 @@ python main.py --analytics
 
 # Export all data
 python main.py --export-data applications.json
+
+# Career Analytics Commands
+python main.py --analyze-career-progression --resume resume.pdf
+python main.py --analyze-industry-trends --skills "Python,JavaScript,React"
+python main.py --generate-recommendations --resume resume.pdf --current-title "Software Developer"
+python main.py --create-analytics-dashboard --resume resume.pdf --skills "Python,JavaScript"
+python main.py --export-analytics --output analytics.json
 ```
 
 ### Application Statuses

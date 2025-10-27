@@ -12,6 +12,13 @@ from src.llm_provider import create_llm_provider
 from src.analyzer import JobApplicationAnalyzer
 from src.output import OutputFormatter
 from src.cache import resume_cache
+from src.ats_analyzer import ATSAnalyzer
+from src.resume_scorer import ResumeScorer
+from src.file_parser import ResumeFileParser
+from src.analytics_dashboard import AnalyticsDashboard
+from src.personalized_recommendation_engine import PersonalizedRecommendationEngine
+from src.career_progression_tracker import CareerProgressionTracker
+from src.industry_trend_analyzer import IndustryTrendAnalyzer
 
 # console = Console()
 console = Console(file=sys.stderr)
@@ -35,6 +42,16 @@ def main():
       python main.py --update-status applied --application-id 1
       python main.py --delete-application 1
       python main.py --analytics
+      
+      # Resume optimization
+      python main.py --analyze-resume resume.pdf
+      python main.py --analyze-resume resume.docx --job job.txt
+      python main.py --score-resume resume.pdf --job job.txt
+      
+      # Career analytics
+      python main.py --career-analytics --resume resume.pdf
+      python main.py --career-dashboard --resume resume.pdf --email user@example.com
+      python main.py --industry-trends --resume resume.pdf
       
       # MCP server mode
       python main.py --mcp-server
@@ -142,6 +159,50 @@ def main():
 
     parser.add_argument(
         "--export-data", metavar="FILE", help="Export all application data to JSON file"
+    )
+    
+    # Resume optimization commands
+    parser.add_argument(
+        "--analyze-resume",
+        metavar="RESUME_FILE",
+        help="Analyze resume for ATS compatibility and optimization"
+    )
+    
+    parser.add_argument(
+        "--score-resume",
+        metavar="RESUME_FILE",
+        help="Calculate comprehensive resume score"
+    )
+    
+    parser.add_argument(
+        "--optimization-output",
+        metavar="FILE",
+        help="Save optimization results to file"
+    )
+    
+    # Career analytics commands
+    parser.add_argument(
+        "--career-analytics",
+        action="store_true",
+        help="Generate comprehensive career analytics"
+    )
+    
+    parser.add_argument(
+        "--career-dashboard",
+        action="store_true",
+        help="Display career analytics dashboard"
+    )
+    
+    parser.add_argument(
+        "--industry-trends",
+        action="store_true",
+        help="Analyze industry trends and market insights"
+    )
+    
+    parser.add_argument(
+        "--career-output",
+        metavar="FILE",
+        help="Save career analytics results to file"
     )
 
     args = parser.parse_args()
@@ -343,13 +404,250 @@ Status Breakdown:
             console.print(f"[green]✓ Data exported to: {args.export_data}[/green]")
             sys.exit(0)
 
+        # Handle resume optimization commands
+        if args.analyze_resume:
+            console.print("[blue]Starting resume analysis...[/blue]")
+            
+            ats_analyzer = ATSAnalyzer()
+            job_description = ""
+            
+            # Get job description if provided
+            if args.job:
+                try:
+                    job_description, _ = validate_inputs(args.job, "")
+                except Exception as e:
+                    console.print(f"[yellow]Warning: Could not parse job description: {e}[/yellow]")
+                    console.print("[yellow]Continuing with resume analysis only...[/yellow]")
+            
+            # Analyze resume
+            optimization = ats_analyzer.analyze_resume(args.analyze_resume, job_description)
+            
+            # Display results
+            console.print("\n[bold cyan]RESUME OPTIMIZATION ANALYSIS[/bold cyan]")
+            console.print("=" * 50)
+            
+            # Overall score
+            ats_score = optimization.ats_compatibility.overall_score * 100
+            console.print(f"\n[bold]Overall ATS Score: {ats_score:.1f}/100[/bold]")
+            console.print(f"Compatibility Level: {optimization.ats_compatibility.compatibility_level.value.title()}")
+            
+            # Priority fixes
+            if optimization.priority_fixes:
+                console.print("\n[bold red]Priority Fixes:[/bold red]")
+                for i, fix in enumerate(optimization.priority_fixes, 1):
+                    console.print(f"  {i}. {fix}")
+            
+            # Content improvements
+            if optimization.content_improvements:
+                console.print("\n[bold yellow]Content Improvements:[/bold yellow]")
+                for i, improvement in enumerate(optimization.content_improvements, 1):
+                    console.print(f"  {i}. {improvement}")
+            
+            # Formatting suggestions
+            if optimization.formatting_suggestions:
+                console.print("\n[bold blue]Formatting Suggestions:[/bold blue]")
+                for i, suggestion in enumerate(optimization.formatting_suggestions, 1):
+                    console.print(f"  {i}. {suggestion}")
+            
+            # Keyword additions
+            if optimization.keyword_additions:
+                console.print("\n[bold green]Keywords to Add:[/bold green]")
+                for i, keyword in enumerate(optimization.keyword_additions, 1):
+                    console.print(f"  {i}. {keyword}")
+            
+            # Save results if requested
+            if args.optimization_output:
+                import json
+                with open(args.optimization_output, 'w', encoding='utf-8') as f:
+                    json.dump(optimization.model_dump(), f, indent=2, ensure_ascii=False, default=str)
+                console.print(f"\n[green]✓ Optimization results saved to: {args.optimization_output}[/green]")
+            
+            sys.exit(0)
+        
+        if args.score_resume:
+            console.print("[blue]Calculating resume score...[/blue]")
+            
+            resume_scorer = ResumeScorer()
+            job_description = ""
+            
+            # Get job description if provided
+            if args.job:
+                try:
+                    job_description, _ = validate_inputs(args.job, "")
+                except Exception as e:
+                    console.print(f"[yellow]Warning: Could not parse job description: {e}[/yellow]")
+                    console.print("[yellow]Continuing with resume scoring only...[/yellow]")
+            
+            # Score resume
+            score = resume_scorer.score_resume("", job_description, args.score_resume)
+            
+            # Display results
+            console.print("\n[bold cyan]RESUME SCORING RESULTS[/bold cyan]")
+            console.print("=" * 40)
+            
+            console.print(f"\n[bold]Total Score: {score.total_score:.1f}/100[/bold]")
+            console.print(f"ATS Compatibility: {score.ats_score:.1f}/100")
+            console.print(f"Content Quality: {score.content_score:.1f}/100")
+            console.print(f"Formatting: {score.formatting_score:.1f}/100")
+            console.print(f"Keyword Optimization: {score.keyword_score:.1f}/100")
+            console.print(f"Experience Relevance: {score.experience_score:.1f}/100")
+            console.print(f"Skills Match: {score.skills_score:.1f}/100")
+            
+            # Overall assessment
+            if score.total_score >= 80:
+                console.print(f"\n[bold green]Excellent resume! Score: {score.total_score:.1f}/100[/bold green]")
+            elif score.total_score >= 70:
+                console.print(f"\n[bold yellow]Good resume with room for improvement. Score: {score.total_score:.1f}/100[/bold yellow]")
+            elif score.total_score >= 60:
+                console.print(f"\n[bold orange]Fair resume, significant improvements needed. Score: {score.total_score:.1f}/100[/bold orange]")
+            else:
+                console.print(f"\n[bold red]Resume needs major improvements. Score: {score.total_score:.1f}/100[/bold red]")
+            
+            # Save results if requested
+            if args.optimization_output:
+                import json
+                with open(args.optimization_output, 'w', encoding='utf-8') as f:
+                    json.dump(score.model_dump(), f, indent=2, ensure_ascii=False, default=str)
+                console.print(f"\n[green]✓ Scoring results saved to: {args.optimization_output}[/green]")
+            
+            sys.exit(0)
+
+        # Handle career analytics commands
+        if args.career_analytics or args.career_dashboard or args.industry_trends:
+            if not args.resume:
+                console.print("[red]Error: --resume is required for career analytics[/red]")
+                sys.exit(1)
+            
+            console.print("[blue]Starting career analytics...[/blue]")
+            
+            # Parse resume file
+            file_parser = ResumeFileParser()
+            parse_result = file_parser.parse_file(args.resume)
+            
+            if not parse_result.parse_success:
+                console.print(f"[red]Failed to parse resume: {parse_result.error_message}[/red]")
+                sys.exit(1)
+            
+            # Create user profile
+            user_profile = {
+                'user_id': args.email or 'anonymous',
+                'email': args.email or 'anonymous@example.com',
+                'resume_content': parse_result.content,
+                'skills': [],  # Will be extracted from resume
+                'current_title': 'Software Developer',  # Will be extracted from resume
+                'location': 'United States'
+            }
+            
+            # Extract basic info from resume
+            resume_content = parse_result.content.lower()
+            
+            # Extract skills (simple keyword matching)
+            skill_keywords = ['python', 'javascript', 'java', 'sql', 'react', 'node', 'aws', 'docker', 'kubernetes', 'git', 'linux', 'machine learning', 'data analysis']
+            user_skills = [skill for skill in skill_keywords if skill in resume_content]
+            user_profile['skills'] = user_skills
+            
+            # Extract job title (first line or common patterns)
+            lines = parse_result.content.split('\n')
+            if lines:
+                first_line = lines[0].strip()
+                if len(first_line) < 50:  # Reasonable length for job title
+                    user_profile['current_title'] = first_line
+            
+            if args.career_dashboard:
+                # Create and display analytics dashboard
+                dashboard_creator = AnalyticsDashboard()
+                dashboard = dashboard_creator.create_dashboard(user_profile)
+                dashboard_creator.display_dashboard(dashboard)
+                
+                # Save results if requested
+                if args.career_output:
+                    dashboard_creator.export_dashboard(dashboard, args.career_output)
+                    console.print(f"\n[green]✓ Dashboard exported to: {args.career_output}[/green]")
+            
+            elif args.career_analytics:
+                # Generate career analytics
+                recommendation_engine = PersonalizedRecommendationEngine()
+                career_analytics = recommendation_engine.create_career_analytics(user_profile)
+                
+                # Display results
+                console.print("\n[bold cyan]CAREER ANALYTICS[/bold cyan]")
+                console.print("=" * 40)
+                
+                console.print(f"\n[bold]Career Score: {career_analytics.career_score:.1f}/100[/bold]")
+                console.print(f"Current Stage: {career_analytics.career_progression.current_stage.value.replace('_', ' ').title()}")
+                console.print(f"Next Stage: {career_analytics.career_progression.next_stage.value.replace('_', ' ').title()}")
+                console.print(f"Progression Score: {career_analytics.career_progression.progression_score:.1%}")
+                console.print(f"Time to Next Stage: {career_analytics.career_progression.time_to_next_stage} months")
+                console.print(f"Market Position: {career_analytics.market_position}")
+                
+                # Skill gaps
+                if career_analytics.career_progression.skill_gaps:
+                    console.print(f"\n[bold red]Skill Gaps:[/bold red]")
+                    for gap in career_analytics.career_progression.skill_gaps:
+                        console.print(f"  • {gap}")
+                
+                # Top recommendations
+                high_priority_recs = [rec for rec in career_analytics.personalized_recommendations if rec.priority == 'high']
+                if high_priority_recs:
+                    console.print(f"\n[bold yellow]High Priority Recommendations:[/bold yellow]")
+                    for rec in high_priority_recs[:3]:
+                        console.print(f"  • {rec.title}")
+                
+                # Save results if requested
+                if args.career_output:
+                    import json
+                    with open(args.career_output, 'w', encoding='utf-8') as f:
+                        json.dump(career_analytics.model_dump(), f, indent=2, ensure_ascii=False, default=str)
+                    console.print(f"\n[green]✓ Career analytics saved to: {args.career_output}[/green]")
+            
+            elif args.industry_trends:
+                # Analyze industry trends
+                trend_analyzer = IndustryTrendAnalyzer()
+                industry_insights = trend_analyzer.analyze_industry_trends(user_profile)
+                skill_trends = trend_analyzer.analyze_skill_trends(user_profile['skills'])
+                
+                # Display results
+                console.print("\n[bold cyan]INDUSTRY TRENDS ANALYSIS[/bold cyan]")
+                console.print("=" * 40)
+                
+                for insight in industry_insights:
+                    console.print(f"\n[bold]{insight.industry.value.title()} Industry[/bold]")
+                    console.print(f"Growth Rate: {insight.growth_rate}%")
+                    console.print(f"Top Skills: {', '.join(insight.top_skills[:5])}")
+                    console.print(f"Outlook: {insight.future_outlook}")
+                
+                if skill_trends:
+                    console.print(f"\n[bold]Skill Trends:[/bold]")
+                    for trend in skill_trends[:5]:
+                        trend_icon = "📈" if trend.trend_direction.value == "rising" else "📊" if trend.trend_direction.value == "stable" else "📉"
+                        console.print(f"  {trend_icon} {trend.skill_name}: {trend.demand_score:.1%} demand, {trend.growth_rate:.1f}% growth")
+                
+                # Save results if requested
+                if args.career_output:
+                    import json
+                    results = {
+                        'industry_insights': [insight.model_dump() for insight in industry_insights],
+                        'skill_trends': [trend.model_dump() for trend in skill_trends]
+                    }
+                    with open(args.career_output, 'w', encoding='utf-8') as f:
+                        json.dump(results, f, indent=2, ensure_ascii=False, default=str)
+                    console.print(f"\n[green]✓ Industry trends saved to: {args.career_output}[/green]")
+            
+            sys.exit(0)
+
         # Validate that job and resume are provided for CLI mode
         if not args.job or not args.resume:
-            console.print(
-                "[red]Error: --job and --resume are required for CLI mode[/red]"
-            )
-            console.print("Use --mcp-server to run in MCP server mode")
-            sys.exit(1)
+            # Check if this is a resume optimization or career analytics command
+            if args.analyze_resume or args.score_resume or args.career_analytics or args.career_dashboard or args.industry_trends:
+                # These commands don't require both job and resume
+                pass
+            else:
+                console.print(
+                    "[red]Error: --job and --resume are required for CLI mode[/red]"
+                )
+                console.print("Use --mcp-server to run in MCP server mode")
+                console.print("Or use --analyze-resume, --score-resume, or career analytics commands")
+                sys.exit(1)
 
         # Display header
         console.print(

@@ -84,8 +84,32 @@ For a user-focused implementation approach, see [phases-timeline.md](./phases-ti
 
 ---
 
+### 📈 Career Analytics & Insights
+**File**: [career-analytics.md](./career-analytics.md)
+
+**Objective**: Comprehensive career progression tracking and industry insights
+
+**Key Features**:
+- Career progression analysis and stage tracking
+- Industry trend analysis and skill demand insights
+- Personalized recommendation engine
+- Competitive analysis and market positioning
+- Salary benchmarking and career milestones
+- Analytics dashboard with actionable insights
+
+**New Components**:
+- `src/career_analytics_models.py` - Pydantic models for career data
+- `src/career_progression_tracker.py` - Career stage analysis
+- `src/industry_trend_analyzer.py` - Industry and skill trend analysis
+- `src/personalized_recommendation_engine.py` - AI-powered recommendations
+- `src/analytics_dashboard.py` - Comprehensive analytics dashboard
+
+**Dependencies**: `pydantic>=2.0.0`, `rich>=13.7.0`
+
+**Success Criteria**: Comprehensive career insights, actionable recommendations, <2s analysis time
+
+---
 ### 🤖 LangChain Integration & Advanced AI Features
-**File**: [langchain-integration.md](./langchain-integration.md)
 
 **Objective**: Integrate LangChain/LangGraph for enhanced AI capabilities
 
@@ -161,13 +185,19 @@ For a user-focused implementation approach, see [phases-timeline.md](./phases-ti
 - Add keyword analysis
 - Integrate with main workflow
 
-### **Week 7-8: Phase 4 - LangChain Integration**
+### **Week 7-8: Phase 4 - Career Analytics**
+- Implement career progression tracking
+- Create industry trend analyzer
+- Build personalized recommendation engine
+- Add analytics dashboard
+
+### **Week 9-10: Phase 5 - LangChain Integration**
 - Migrate to LangChain/LangGraph
 - Implement structured outputs
 - Add caching and observability
 - Enhance all previous phases
 
-### **Week 9-10: Phase 5 - Web Interface**
+### **Week 11-12: Phase 6 - Web Interface**
 - Build FastAPI backend
 - Create React frontend
 - Implement real-time features
@@ -294,8 +324,9 @@ ALLOWED_FILE_TYPES=.pdf,.doc,.docx,.txt
 - **Phase 1**: 95%+ parsing success rate
 - **Phase 2**: <1s database query performance
 - **Phase 3**: Accurate ATS compatibility detection
-- **Phase 4**: 50%+ cache hit rate, comprehensive observability
-- **Phase 5**: Responsive web interface, real-time updates
+- **Phase 4**: Comprehensive career insights, actionable recommendations
+- **Phase 5**: 50%+ cache hit rate, comprehensive observability
+- **Phase 6**: Responsive web interface, real-time updates
 
 ## Getting Started
 
