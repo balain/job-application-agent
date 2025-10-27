@@ -41,6 +41,48 @@ The Job Application Agent follows a structured workflow to analyze job applicati
 - **Analytics Dashboard**: Comprehensive insights into application success rates and patterns
 - **Resume Optimization**: ATS compatibility analysis, resume scoring, and improvement recommendations
 - **Career Analytics**: Career progression tracking, industry trend analysis, and personalized recommendations
+- **LangChain Integration**: Advanced AI workflows with structured outputs, RAG, and iterative optimization
+
+## LangChain Integration
+
+The job application agent includes advanced LangChain integration for enhanced reliability, structured outputs, and intelligent workflows.
+
+### Key LangChain Features
+
+- **Structured Output Parsing**: Reliable JSON extraction using Pydantic models
+- **RAG (Retrieval-Augmented Generation)**: Find similar applications and get insights
+- **LangGraph Workflows**: Iterative resume optimization with state management
+- **Advanced Caching**: Automatic response caching to reduce API costs
+- **Observability**: Built-in metrics tracking and LangSmith integration
+- **Entity Extraction**: Structured extraction of job and resume entities
+
+### Usage
+
+```bash
+# Basic LangChain analysis
+python main.py --job job.txt --resume resume.pdf --langchain
+
+# With RAG for similar application insights
+python main.py --job job.txt --resume resume.pdf --langchain --enable-rag
+
+# With iterative resume tailoring
+python main.py --job job.txt --resume resume.pdf --langchain --enable-tailoring
+
+# View LangChain metrics
+python main.py --langchain-metrics
+
+# Export metrics to file
+python main.py --export-metrics metrics.json
+```
+
+### LangChain Components
+
+- **LLM Wrapper**: Seamless integration with existing Claude/Ollama providers
+- **Structured Parser**: Pydantic-based output parsing for reliable results
+- **Entity Extractor**: Extract structured entities from job descriptions and resumes
+- **RAG System**: Vector store for finding similar applications
+- **Resume Tailor**: LangGraph workflow for iterative resume optimization
+- **Observability**: Metrics tracking and performance monitoring
 
 ## Structured Output Parsing
 

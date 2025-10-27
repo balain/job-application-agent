@@ -20,6 +20,8 @@ data/
 applications/
 applications
 
+# Utilities
+go-*.sh
 
 # IDE files
 .vscode/

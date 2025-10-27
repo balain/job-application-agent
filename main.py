@@ -19,6 +19,8 @@ from src.analytics_dashboard import AnalyticsDashboard
 from src.personalized_recommendation_engine import PersonalizedRecommendationEngine
 from src.career_progression_tracker import CareerProgressionTracker
 from src.industry_trend_analyzer import IndustryTrendAnalyzer
+from src.langchain_analyzer import LangChainJobApplicationAnalyzer
+from src.langchain_observability import get_metrics, reset_metrics, export_metrics
 
 # console = Console()
 console = Console(file=sys.stderr)
@@ -52,6 +54,12 @@ def main():
       python main.py --career-analytics --resume resume.pdf
       python main.py --career-dashboard --resume resume.pdf --email user@example.com
       python main.py --industry-trends --resume resume.pdf
+      
+      # LangChain integration
+      python main.py --job job.txt --resume resume.pdf --langchain
+      python main.py --job job.txt --resume resume.pdf --langchain --enable-rag --enable-tailoring
+      python main.py --langchain-metrics
+      python main.py --export-metrics metrics.json
       
       # MCP server mode
       python main.py --mcp-server
@@ -205,6 +213,43 @@ def main():
         help="Save career analytics results to file"
     )
 
+    # LangChain integration options
+    parser.add_argument(
+        "--langchain",
+        action="store_true",
+        help="Use LangChain-enhanced analysis with structured outputs and advanced features"
+    )
+
+    parser.add_argument(
+        "--enable-rag",
+        action="store_true",
+        help="Enable RAG (Retrieval-Augmented Generation) for similar application insights"
+    )
+
+    parser.add_argument(
+        "--enable-tailoring",
+        action="store_true",
+        help="Enable iterative resume tailoring using LangGraph workflows"
+    )
+
+    parser.add_argument(
+        "--langchain-metrics",
+        action="store_true",
+        help="Show LangChain operation metrics and exit"
+    )
+
+    parser.add_argument(
+        "--reset-metrics",
+        action="store_true",
+        help="Reset LangChain metrics and exit"
+    )
+
+    parser.add_argument(
+        "--export-metrics",
+        metavar="FILE",
+        help="Export LangChain metrics to file"
+    )
+
     args = parser.parse_args()
 
     try:
@@ -220,6 +265,22 @@ def main():
 
         if args.cache_stats:
             resume_cache.display_cache_info()
+            sys.exit(0)
+
+        # Handle LangChain metrics commands
+        if args.langchain_metrics:
+            metrics = get_metrics()
+            console.print(Panel(str(metrics), title="LangChain Metrics"))
+            sys.exit(0)
+
+        if args.reset_metrics:
+            reset_metrics()
+            console.print("[green]LangChain metrics reset successfully[/green]")
+            sys.exit(0)
+
+        if args.export_metrics:
+            file_path = export_metrics(args.export_metrics)
+            console.print(f"[green]Metrics exported to {file_path}[/green]")
             sys.exit(0)
 
         if args.mcp_server:
@@ -680,8 +741,19 @@ Status Breakdown:
 
         # Perform analysis
         console.print("[blue]Starting analysis...[/blue]")
-        analyzer = JobApplicationAnalyzer(llm_provider)
-        results = analyzer.analyze_application(job_description, resume_text)
+        
+        # Choose analyzer based on LangChain flag
+        if args.langchain:
+            analyzer = LangChainJobApplicationAnalyzer(llm_provider)
+            results = analyzer.analyze_application(
+                job_description=job_description,
+                resume=resume_text,
+                enable_rag=args.enable_rag,
+                enable_tailoring=args.enable_tailoring
+            )
+        else:
+            analyzer = JobApplicationAnalyzer(llm_provider)
+            results = analyzer.analyze_application(job_description, resume_text)
 
         # Display results
         formatter = OutputFormatter(verbose=args.verbose)

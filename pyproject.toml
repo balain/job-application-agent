@@ -1,6 +1,6 @@
 [project]
 name = "job-application-agent"
-version = "0.2.0"
+version = "0.3.0"
 description = "AI agent to review and assess fitness for posted job description."
 readme = "README.md"
 requires-python = ">=3.13"
@@ -18,6 +18,13 @@ dependencies = [
     "pydantic>=2.0.0", # Structured data validation
     "sqlalchemy>=2.0.0", # Database ORM
     "pypdf>=3.0.0", # PDF parsing for resume analysis
+    "langchain>=0.1.0", # LangChain framework
+    "langchain-anthropic>=0.1.0", # Claude integration
+    "langchain-community>=0.0.20", # Community integrations
+    "langgraph>=0.0.20", # State machine workflows
+    "langchain-chroma>=0.1.0", # Vector store integration
+    "chromadb>=0.4.0", # Vector database
+    "openai>=1.0.0", # OpenAI embeddings
 ]
 
 [project.optional-dependencies]
