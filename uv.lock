@@ -948,7 +948,7 @@ wheels = [
 
 [[package]]
 name = "job-application-agent"
-version = "0.2.0"
+version = "0.3.0"
 source = { virtual = "." }
 dependencies = [
     { name = "anthropic" },
