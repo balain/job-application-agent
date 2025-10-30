@@ -1,3 +1,7 @@
+---
+alwaysApply: false
+---
+
 # Job Application Agent - Cursor Rules
 
 ## Project Overview
@@ -220,3 +224,5 @@ except Exception as e:
 - Use dependency injection for testability
 - Use `ruff format` and `ruff check` periodically and before every git commit - ensure all issues are removed before checking in code
 - Allow the GitHub URL: "https://github.com/balain/job-application-agent.git" in README.md, otherwise, ensure that all strings listed in ./.ignore-strings are not found (in any capitalization) in any files committed to git; if they are found, warn me before allowing the commit with an explicit message
+- Before any `git commit` create a current and concise commit message in plain text that can be pasted into the commit description textbox in the editor; avoid emojis; keep the descriptions short and meaningful with no extra fluff
+

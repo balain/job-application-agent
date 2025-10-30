@@ -57,6 +57,23 @@ class Config:
         os.getenv("RESPONSE_VALIDATION_ENABLED", "true").lower() == "true"
     )
 
+    # Multi-agent settings
+    MULTI_AGENT_ENABLED = os.getenv("MULTI_AGENT_ENABLED", "false").lower() == "true"
+    AGENT_PARALLEL_EXECUTION = (
+        os.getenv("AGENT_PARALLEL_EXECUTION", "false").lower() == "true"
+    )
+    QUALITY_REVIEW_ENABLED = (
+        os.getenv("QUALITY_REVIEW_ENABLED", "true").lower() == "true"
+    )
+    ENABLE_CAREER_ADVISOR = (
+        os.getenv("ENABLE_CAREER_ADVISOR", "false").lower() == "true"
+    )
+    ENABLE_LEARNING_PLAN = (
+        os.getenv("ENABLE_LEARNING_PLAN", "false").lower() == "true"
+    )
+    AGENT_MAX_RETRIES = int(os.getenv("AGENT_MAX_RETRIES", "2"))
+    AGENT_BACKOFF_FACTOR = float(os.getenv("AGENT_BACKOFF_FACTOR", "2.0"))
+
     @classmethod
     def validate(cls) -> bool:
         """Validate that required configuration is present."""

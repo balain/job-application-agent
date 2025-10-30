@@ -21,6 +21,7 @@ from src.career_progression_tracker import CareerProgressionTracker
 from src.industry_trend_analyzer import IndustryTrendAnalyzer
 from src.langchain_analyzer import LangChainJobApplicationAnalyzer
 from src.langchain_observability import get_metrics, reset_metrics, export_metrics
+from src.multi_agent.workflow import run_multi_agent_workflow
 
 # console = Console()
 console = Console(file=sys.stderr)
@@ -218,6 +219,23 @@ def main():
         "--langchain",
         action="store_true",
         help="Use LangChain-enhanced analysis with structured outputs and advanced features"
+    )
+
+    # Multi-agent options
+    parser.add_argument(
+        "--multi-agent",
+        action="store_true",
+        help="Use multi-agent LangGraph workflow with orchestrator",
+    )
+    parser.add_argument(
+        "--enable-career-advisor",
+        action="store_true",
+        help="Enable career advisor agent in multi-agent workflow",
+    )
+    parser.add_argument(
+        "--enable-learning-plan",
+        action="store_true",
+        help="Enable learning plan agent in multi-agent workflow",
     )
 
     parser.add_argument(
@@ -742,8 +760,20 @@ Status Breakdown:
         # Perform analysis
         console.print("[blue]Starting analysis...[/blue]")
         
-        # Choose analyzer based on LangChain flag
-        if args.langchain:
+        # Choose analyzer based on flags (multi-agent > langchain > default)
+        if args.multi_agent or Config.MULTI_AGENT_ENABLED:
+            if args.enable_career_advisor:
+                Config.ENABLE_CAREER_ADVISOR = True
+            if args.enable_learning_plan:
+                Config.ENABLE_LEARNING_PLAN = True
+            results = run_multi_agent_workflow(
+                llm_provider=llm_provider,
+                job_description=job_description,
+                resume=resume_text,
+                user_email=args.email,
+                user_name=args.name,
+            )
+        elif args.langchain:
             analyzer = LangChainJobApplicationAnalyzer(llm_provider)
             results = analyzer.analyze_application(
                 job_description=job_description,

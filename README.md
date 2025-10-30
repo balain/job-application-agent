@@ -21,6 +21,7 @@ This agent **analyzes and provides recommendations**
 ## Features
 
 - **Smart Analysis**: Rates job suitability on a 1-10 scale with detailed breakdown
+- **Multi-Agent Orchestrator**: Orchestrated agents for assessment, resume optimization, cover letter, interview prep, history logging, and optional career advising/learning plans
 - **Multiple Input Formats**: Supports job descriptions from URLs or files, resumes in text, Markdown, Word, or PDF formats
 - **AI-Powered**: Uses Claude or Ollama for intelligent analysis
 - **Comprehensive Output**: Generates resume improvements, cover letters, interview questions, and action plans
@@ -75,6 +76,17 @@ or, with plain python:
 
 ```bash
 python main.py --job "https://example.com/job-posting" --resume resume.docx
+```
+
+Multi-agent workflow examples:
+
+```bash
+# Enable orchestrated multi-agent analysis
+python main.py --job job.txt --resume resume.docx --multi-agent
+
+# With optional advisory agents
+python main.py --job job.txt --resume resume.docx --multi-agent \
+  --enable-career-advisor --enable-learning-plan
 ```
 
 ## Documentation

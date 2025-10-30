@@ -162,6 +162,31 @@ python main.py --mcp-server
 
 See [MCP Server Integration](#mcp-server-integration) section for setup details.
 
+## Multi-Agent Workflow
+
+Run the orchestrated multi-agent analysis instead of the single-agent analyzer.
+
+### Commands
+
+```bash
+# Basic multi-agent run
+python main.py --job job.txt --resume resume.docx --multi-agent
+
+# Enable advisory agents
+python main.py --job job.txt --resume resume.docx --multi-agent \
+  --enable-career-advisor --enable-learning-plan
+```
+
+### Behavior
+- Orchestrates specialized agents: assessment, resume optimization, cover letter, interview prep, history logging
+- Optional: career advisor and learning plan agents
+- Produces the same `AnalysisResult` structure as single-agent, so existing output flows still work
+
+### Flags
+- `--multi-agent`: enable the multi-agent workflow
+- `--enable-career-advisor`: include career advisor agent
+- `--enable-learning-plan`: include learning plan agent
+
 ## Command Line Options
 
 ### Core Options

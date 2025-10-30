@@ -166,3 +166,24 @@ The agent can run as a Model Context Protocol (MCP) server, providing tools for 
 - `prepare_interview_questions`: Interview preparation
 - `get_next_steps`: Action plan for job application
 
+## Multi-Agent Architecture
+
+The system supports an orchestrated multi-agent workflow built with LangGraph. Agents are specialized and coordinated by an Orchestrator.
+
+### Agents
+- OrchestratorAgent: routing, retries, final assembly
+- JobFitAssessmentAgent: initial suitability analysis
+- ResumeOptimizationAgent: ATS and keyword optimization
+- CoverLetterAgent: job-specific cover letter
+- InterviewPrepAgent: interview prep
+- HistoryAgent: writes analysis outcomes/status to DB
+- CareerAdvisorAgent (optional): career paths, skills, market outlook
+- LearningAgent (optional): training plan and milestones
+- QualityReviewAgent: consistency checks and final synthesis
+
+### Flow
+Orchestrator → Assessment → [Resume | Cover Letter | Interview] (parallelizable) → History → [Career Advisor, Learning] (optional) → Quality Review → Result
+
+### Result Mapping
+The workflow returns the same `AnalysisResult` structure to preserve CLI/MCP compatibility.
+

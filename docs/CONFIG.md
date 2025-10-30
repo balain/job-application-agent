@@ -103,3 +103,26 @@ The application includes comprehensive data encryption for GDPR compliance:
 3. **Cache Expiry**: Set appropriate expiry times based on your data retention needs
 4. **YubiKey**: Use hardware keys for enhanced security in production environments
 
+## Multi-Agent Settings
+
+Enable and configure the multi-agent workflow via environment variables:
+
+```bash
+# Core switches
+MULTI_AGENT_ENABLED=true
+AGENT_PARALLEL_EXECUTION=false
+QUALITY_REVIEW_ENABLED=true
+
+# Optional advisory agents
+ENABLE_CAREER_ADVISOR=false
+ENABLE_LEARNING_PLAN=false
+
+# Orchestrator behavior
+AGENT_MAX_RETRIES=2
+AGENT_BACKOFF_FACTOR=2.0
+```
+
+Notes:
+- You can also enable per-run via CLI flags (`--multi-agent`, `--enable-career-advisor`, `--enable-learning-plan`).
+- Parallel execution can be enabled later; defaults to sequential for predictability.
+
