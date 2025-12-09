@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## [Archived] - 2025-01-27
+## [Archived] - 2025-12-09
 
 ### Changed
 - Repository archived - no longer actively maintained

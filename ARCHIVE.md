@@ -4,7 +4,7 @@ This repository has been archived and is no longer actively maintained.
 
 ## Archive Date
 
-January 27, 2025
+December 9, 2025
 
 ## Archive Status
 

@@ -1,5 +1,10 @@
 # 🚀 **Implementation Plan: Job Application Agent Enhancements**
 
+> **⚠️ ARCHIVED**  
+> This document contains future development plans that are no longer active. This repository has been archived and these plans will not be implemented.
+
+---
+
 ## **Phase 1: Data-at-Rest Encryption & GDPR Compliance**
 
 ### **1.1 Encryption Architecture**

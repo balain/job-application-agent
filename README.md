@@ -1,5 +1,10 @@
 # Job Application Agent
 
+> **⚠️ ARCHIVED REPOSITORY**  
+> This repository has been archived and is no longer actively maintained. The code is provided as-is for historical reference. No further updates, bug fixes, or feature additions will be made.
+
+---
+
 An AI-powered analysis tool that assesses suitability to a specific job (based on provided job description and resume) and provides comprehensive recommendations for next steps.
 
 ## ⚠️ Important: This is NOT an automated job application tool
